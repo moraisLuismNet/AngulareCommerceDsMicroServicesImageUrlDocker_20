@@ -1,17 +1,17 @@
-import { Injectable, OnDestroy, inject } from '@angular/core';
-import { BehaviorSubject, Observable, of, Subject, throwError } from 'rxjs';
-import { catchError, tap, takeUntil } from 'rxjs/operators';
-import { UserService } from 'src/app/services/UserService';
-import { IRecord, ICart } from '../EcommerceInterface';
-import { CartDetailService } from './CartDetailService';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { environment } from 'src/environments/environment';
-import { AuthGuard } from 'src/app/guards/AuthGuardService';
-import { StockService } from './StockService';
-import { CartEventsService } from '../../shared/services/CartEventsService';
+import { Injectable, OnDestroy, inject } from "@angular/core";
+import { BehaviorSubject, Observable, of, Subject, throwError } from "rxjs";
+import { catchError, tap, takeUntil } from "rxjs/operators";
+import { UserService } from "src/app/services/UserService";
+import { IRecord, ICart } from "../EcommerceInterface";
+import { CartDetailService } from "./CartDetailService";
+import { HttpClient, HttpHeaders } from "@angular/common/http";
+import { environment } from "src/environments/environment";
+import { AuthGuard } from "src/app/guards/AuthGuardService";
+import { StockService } from "./StockService";
+import { CartEventsService } from "../../shared/services/CartEventsService";
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: "root",
 })
 export class CartService implements OnDestroy {
   private readonly baseUrl = environment.apiUrl.shoppingService;
@@ -80,9 +80,7 @@ export class CartService implements OnDestroy {
   }
 
   private setupCartResetListener(): void {
-    this.cartEvents.cartReset$.pipe(
-      takeUntil(this.destroy$)
-    ).subscribe(() => {
+    this.cartEvents.cartReset$.pipe(takeUntil(this.destroy$)).subscribe(() => {
       this.resetCart();
     });
   }
@@ -91,7 +89,7 @@ export class CartService implements OnDestroy {
     this.cartSubject.next(cartItems);
     this.updateCartCount(cartItems);
     this.calculateAndUpdateLocalTotal();
-    this.saveCartForUser(this.userService.email || '', cartItems);
+    this.saveCartForUser(this.userService.email || "", cartItems);
   }
 
   private shouldSyncCart(email: string | null): boolean {
@@ -101,24 +99,26 @@ export class CartService implements OnDestroy {
     );
   }
   syncCartWithBackend(email: string): void {
-    
     if (!email || !this.authGuard.isLoggedIn()) {
       return;
     }
 
     // Skip cart sync for admin users
-    if (this.authGuard.getRole() === 'Admin') {
+    if (this.authGuard.getRole() === "Admin") {
       this.cart = [];
       this.updateCartState([]);
       return;
     }
-    
+
     this.cartDetailService
       .getCartDetails(email)
       .pipe(
         takeUntil(this.destroy$),
-        catchError(error => {
-          console.error('[CartService] Error syncing cart with backend:', error);
+        catchError((error) => {
+          console.error(
+            "[CartService] Error syncing cart with backend:",
+            error
+          );
           return of({ $values: [] });
         })
       )
@@ -129,7 +129,7 @@ export class CartService implements OnDestroy {
             this.updateCartState([]);
             return;
           }
-          
+
           const updatedCart = cartDetails.map((detail: any) => ({
             ...detail,
             amount: Number(detail.amount) || 1,
@@ -140,13 +140,13 @@ export class CartService implements OnDestroy {
             image: detail.imageRecord,
             stock: detail.stock || 0,
           }));
-          
+
           // Calculate total items for the cart counter
           const totalItems = updatedCart.reduce(
-            (total: number, item: any) => total + (Number(item.amount) || 0), 
+            (total: number, item: any) => total + (Number(item.amount) || 0),
             0
           );
-          
+
           // Update the cart state with the new items
           this.cart = updatedCart;
           this.cartSubject.next(updatedCart);
@@ -154,14 +154,17 @@ export class CartService implements OnDestroy {
           this.calculateAndUpdateLocalTotal();
           this.saveCartForUser(email, updatedCart);
           this.cartEnabledSubject.next(true);
+
+          // Ensure navbar is updated with the latest values
+          this.updateCartNavbar(totalItems, this.cartTotalSubject.value);
         },
         error: (error) => {
-          console.error('[CartService] Error syncing cart with backend:', {
+          console.error("[CartService] Error syncing cart with backend:", {
             status: error.status,
             message: error.message,
-            error: error.error
+            error: error.error,
           });
-          
+
           // If there's an error, try to load from local storage as fallback
           const savedCart = this.getCartForUser(email);
           if (savedCart && savedCart.length > 0) {
@@ -169,18 +172,18 @@ export class CartService implements OnDestroy {
           } else {
             this.updateCartState([]);
           }
-        }
+        },
       });
   }
 
   addToCart(record: IRecord): Observable<any> {
     const userEmail = this.userService.email;
-    if (!userEmail) return throwError(() => new Error('Unauthenticated user'));
+    if (!userEmail) return throwError(() => new Error("Unauthenticated user"));
 
     // Get the current stock before adding
-    const currentStock = this.cartSubject.value.find(
-      item => item.idRecord === record.idRecord
-    )?.stock ?? record.stock;
+    const currentStock =
+      this.cartSubject.value.find((item) => item.idRecord === record.idRecord)
+        ?.stock ?? record.stock;
 
     return this.cartDetailService
       .addToCartDetail(userEmail, record.idRecord, 1)
@@ -194,14 +197,17 @@ export class CartService implements OnDestroy {
           const existingItem = currentCart.find(
             (item) => item.idRecord === record.idRecord
           );
-          
+
           if (existingItem) {
             existingItem.amount = (existingItem.amount || 0) + 1;
             // Update the stock by decrementing it by 1 when adding to cart
-            if (typeof currentStock === 'number') {
+            if (typeof currentStock === "number") {
               existingItem.stock = Math.max(0, currentStock - 1);
               // Notify stock service of the update
-              this.stockService.updateStock(record.idRecord, existingItem.stock);
+              this.stockService.updateStock(
+                record.idRecord,
+                existingItem.stock
+              );
             }
             cartUpdated = true;
           } else {
@@ -209,7 +215,10 @@ export class CartService implements OnDestroy {
               ...record,
               amount: 1,
               inCart: true,
-              stock: typeof currentStock === 'number' ? Math.max(0, currentStock - 1) : 0,
+              stock:
+                typeof currentStock === "number"
+                  ? Math.max(0, currentStock - 1)
+                  : 0,
             };
             currentCart.push(newItem);
             cartUpdated = true;
@@ -219,21 +228,24 @@ export class CartService implements OnDestroy {
             // Update cart state
             this.cart = [...currentCart];
             this.cartSubject.next(this.cart);
-            
+
             // Update cart count
-            const itemCount = currentCart.reduce((sum, item) => sum + (item.amount || 0), 0);
+            const itemCount = currentCart.reduce(
+              (sum, item) => sum + (item.amount || 0),
+              0
+            );
             this.cartItemCountSubject.next(itemCount);
-            
+
             // Calculate and update total
             const total = this.calculateCartTotal(currentCart);
             this.cartTotalSubject.next(total);
-            
+
             // Save to local storage
             this.saveCartForUser(userEmail, currentCart);
           }
         }),
         catchError((error) => {
-          console.error('Error adding to cart:', error);
+          console.error("Error adding to cart:", error);
           return throwError(() => error);
         })
       );
@@ -242,12 +254,12 @@ export class CartService implements OnDestroy {
   removeFromCart(record: IRecord): Observable<any> {
     const userEmail = this.userService.email;
     if (!userEmail) {
-      return throwError(() => new Error('Unauthenticated user'));
+      return throwError(() => new Error("Unauthenticated user"));
     }
-    
+
     // Get the current stock before removal
     const currentStock = this.cartSubject.value.find(
-      item => item.idRecord === record.idRecord
+      (item) => item.idRecord === record.idRecord
     )?.stock;
 
     return this.cartDetailService
@@ -255,23 +267,26 @@ export class CartService implements OnDestroy {
       .pipe(
         tap(() => {
           // Get current cart
-          const currentCart = this.cartSubject.value;
+          const currentCart = [...this.cartSubject.value];
           // Update the cart item
           const existingItem = currentCart.find(
             (item) => item.idRecord === record.idRecord
           );
-          
+
           if (existingItem) {
             // Update the amount
             existingItem.amount = Math.max(0, (existingItem.amount || 0) - 1);
-            
+
             // Update the stock by incrementing it by 1 when removing from cart
-            if (typeof currentStock === 'number') {
+            if (typeof currentStock === "number") {
               existingItem.stock = currentStock + 1;
               // Notify stock service of the update
-              this.stockService.updateStock(record.idRecord, existingItem.stock);
+              this.stockService.updateStock(
+                record.idRecord,
+                existingItem.stock
+              );
             }
-            
+
             // Remove item if amount reaches 0
             if (existingItem.amount === 0) {
               const index = currentCart.indexOf(existingItem);
@@ -280,12 +295,13 @@ export class CartService implements OnDestroy {
               }
             }
           }
-          
+
           // Update cart state
+          this.cart = [...currentCart];
           this.updateCartState(currentCart);
         }),
         catchError((error) => {
-          console.error('Error removing from cart:', error);
+          console.error("Error removing from cart:", error);
           return throwError(() => error);
         })
       );
@@ -320,34 +336,34 @@ export class CartService implements OnDestroy {
       this.cartSubject.next([...currentCart]);
       this.updateCartCount(currentCart);
       this.calculateAndUpdateLocalTotal();
-      this.saveCartForUser(this.userService.email || '', currentCart);
+      this.saveCartForUser(this.userService.email || "", currentCart);
     }
   }
 
   getCart(email: string): Observable<ICart> {
-    const url = `${this.baseUrl}Carts/GetCartByEmail/${encodeURIComponent(email)}`;
+    const url = `${this.baseUrl}Carts/GetCartByEmail/${encodeURIComponent(
+      email
+    )}`;
     const headers = this.getHeaders();
-    return this.httpClient
-      .get<ICart>(url, { headers })
-      .pipe(
-        catchError((error) => {
-          console.error('[CartService] Error getting cart:', error);
-          return of({} as ICart);
-        })
-      );
+    return this.httpClient.get<ICart>(url, { headers }).pipe(
+      catchError((error) => {
+        console.error("[CartService] Error getting cart:", error);
+        return of({} as ICart);
+      })
+    );
   }
 
   getCartStatus(email: string): Observable<{ enabled: boolean }> {
-    const url = `${this.baseUrl}Carts/GetCartStatus/${encodeURIComponent(email)}`;
+    const url = `${this.baseUrl}Carts/GetCartStatus/${encodeURIComponent(
+      email
+    )}`;
     const headers = this.getHeaders();
-    return this.httpClient
-      .get<{ enabled: boolean }>(url, { headers })
-      .pipe(
-        catchError((error) => {
-          console.error('[CartService] Error getting cart status:', error);
-          return of({ enabled: true });
-        })
-      );
+    return this.httpClient.get<{ enabled: boolean }>(url, { headers }).pipe(
+      catchError((error) => {
+        console.error("[CartService] Error getting cart status:", error);
+        return of({ enabled: true });
+      })
+    );
   }
 
   private getHeaders(): HttpHeaders {
@@ -368,7 +384,7 @@ export class CartService implements OnDestroy {
       .get<ICart[]>(`${this.baseUrl}Carts`, { headers })
       .pipe(
         catchError((error) => {
-          console.error('Error getting all carts:', error);
+          console.error("Error getting all carts:", error);
           return throwError(() => error);
         })
       );
@@ -385,12 +401,12 @@ export class CartService implements OnDestroy {
           const updatedCart = currentCart.map((item) => ({
             ...item,
             price: 0,
-            amount: 0, 
+            amount: 0,
           }));
           this.updateCartState(updatedCart);
         }),
         catchError((error) => {
-          console.error('Error disabling cart:', error);
+          console.error("Error disabling cart:", error);
           return throwError(() => error);
         })
       );
@@ -402,7 +418,7 @@ export class CartService implements OnDestroy {
       .post(`${this.baseUrl}Carts/Enable/${email}`, {}, { headers })
       .pipe(
         catchError((error) => {
-          console.error('Error enabling cart:', error);
+          console.error("Error enabling cart:", error);
           return throwError(() => error);
         })
       );
@@ -413,30 +429,27 @@ export class CartService implements OnDestroy {
       (total: number, item: IRecord) => total + (Number(item.amount) || 0),
       0
     );
-    
+
     // Ensure we're in the Angular zone to trigger change detection
     if (this.cartItemCountSubject.value !== totalItems) {
       this.cartItemCountSubject.next(totalItems);
-    } 
+    }
   }
 
   private calculateAndUpdateLocalTotal(): void {
     const total = this.calculateCartTotal(this.cart);
-    
+
     if (this.cartTotalSubject.value !== total) {
       this.cartTotalSubject.next(total);
-    } 
+    }
   }
 
   private calculateCartTotal(cart: IRecord[]): number {
-    return cart.reduce(
-      (sum: number, item: IRecord) => {
-        const price = Number(item.price) || 0;
-        const amount = Number(item.amount) || 0;
-        const itemTotal = price * amount;
-        return sum + itemTotal;
-      },
-      0
-    );
+    return cart.reduce((sum: number, item: IRecord) => {
+      const price = Number(item.price) || 0;
+      const amount = Number(item.amount) || 0;
+      const itemTotal = price * amount;
+      return sum + itemTotal;
+    }, 0);
   }
 }

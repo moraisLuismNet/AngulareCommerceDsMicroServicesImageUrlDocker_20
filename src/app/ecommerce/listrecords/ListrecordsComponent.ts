@@ -1,14 +1,21 @@
-import { Component, inject, afterNextRender, ChangeDetectionStrategy, ChangeDetectorRef, DestroyRef } from "@angular/core";
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import {
+  Component,
+  inject,
+  afterNextRender,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  DestroyRef,
+} from "@angular/core";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
+import { CommonModule } from "@angular/common";
+import { FormsModule } from "@angular/forms";
 import { RouterModule, ActivatedRoute, Router } from "@angular/router";
 
 // PrimeNG Modules
-import { TableModule } from 'primeng/table';
-import { ButtonModule } from 'primeng/button';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { DialogModule } from 'primeng/dialog';
+import { TableModule } from "primeng/table";
+import { ButtonModule } from "primeng/button";
+import { ConfirmDialogModule } from "primeng/confirmdialog";
+import { DialogModule } from "primeng/dialog";
 import { ConfirmationService } from "primeng/api";
 
 // RxJS
@@ -28,22 +35,21 @@ import { AuthGuard } from "src/app/guards/AuthGuardService";
 import { IRecord } from "../EcommerceInterface";
 
 @Component({
-    selector: "app-listrecords",
-    templateUrl: "./ListrecordsComponent.html",
-    imports: [
-        CommonModule,
-        FormsModule,
-        RouterModule,
-        TableModule,
-        ButtonModule,
-        ConfirmDialogModule,
-        DialogModule
-    ],
-    providers: [ConfirmationService],
-    changeDetection: ChangeDetectionStrategy.OnPush
+  selector: "app-listrecords",
+  templateUrl: "./ListrecordsComponent.html",
+  imports: [
+    CommonModule,
+    FormsModule,
+    RouterModule,
+    TableModule,
+    ButtonModule,
+    ConfirmDialogModule,
+    DialogModule,
+  ],
+  providers: [ConfirmationService],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ListrecordsComponent {
-
   records: IRecord[] = [];
   filteredRecords: IRecord[] = [];
   searchText: string = "";
@@ -58,7 +64,7 @@ export class ListrecordsComponent {
   isAddingToCart = false;
   loading: boolean = false;
   cartEnabled: boolean = false;
-  
+
   private readonly destroyRef = inject(DestroyRef);
 
   record: IRecord = {
@@ -89,16 +95,18 @@ export class ListrecordsComponent {
 
   constructor() {
     // Subscribe to route parameters immediately to load data on initial navigation
-    this.route.paramMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
-      const idGroup = params.get("idGroup");
-      if (idGroup) {
-        this.groupId = idGroup;
-        this.loadRecords(idGroup);
-      } else {
-        this.errorMessage = "No group ID provided";
-        this.visibleError = true;
-      }
-    });
+    this.route.paramMap
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((params) => {
+        const idGroup = params.get("idGroup");
+        if (idGroup) {
+          this.groupId = idGroup;
+          this.loadRecords(idGroup);
+        } else {
+          this.errorMessage = "No group ID provided";
+          this.visibleError = true;
+        }
+      });
 
     // Only configure subscriptions if the user is authenticated
     if (this.authGuard.isLoggedIn()) {
@@ -111,7 +119,6 @@ export class ListrecordsComponent {
     afterNextRender(() => {
       // Any DOM-dependent initialization can go here
     });
-
   }
 
   checkCartStatus() {
@@ -158,6 +165,7 @@ export class ListrecordsComponent {
               this.filteredRecords = [...this.filteredRecords];
             }
           }
+          this.cdr.markForCheck();
         });
       });
 
@@ -166,21 +174,17 @@ export class ListrecordsComponent {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((update) => {
         if (!update) return;
-        
+
         const { recordId, newStock } = update;
-        
+
         // Update records array
-        this.records = this.records.map((record) => 
-          record.idRecord === recordId 
-            ? { ...record, stock: newStock }
-            : record
+        this.records = this.records.map((record) =>
+          record.idRecord === recordId ? { ...record, stock: newStock } : record
         );
-        
+
         // Update filtered records
-        this.filteredRecords = this.filteredRecords.map((record) => 
-          record.idRecord === recordId 
-            ? { ...record, stock: newStock }
-            : record
+        this.filteredRecords = this.filteredRecords.map((record) =>
+          record.idRecord === recordId ? { ...record, stock: newStock } : record
         );
       });
 
@@ -230,8 +234,8 @@ export class ListrecordsComponent {
         tap((records: IRecord[]) => {
           // Initialize stock values in the stock service
           if (records && records.length > 0) {
-            records.forEach(record => {
-              if (record.idRecord && typeof record.stock === 'number') {
+            records.forEach((record) => {
+              if (record.idRecord && typeof record.stock === "number") {
                 this.stockService.updateStock(record.idRecord, record.stock);
               }
             });
@@ -245,9 +249,9 @@ export class ListrecordsComponent {
           }
 
           this.records = records;
-        this.cdr.markForCheck();
-        // Get cart items to sync cart status
-        return this.cartService.getCartItems().pipe(
+          this.cdr.markForCheck();
+          // Get cart items to sync cart status
+          return this.cartService.getCartItems().pipe(
             map((cartItems: IRecord[]) => {
               // Update cart status for each record
               this.records.forEach((record) => {
@@ -331,7 +335,7 @@ export class ListrecordsComponent {
       this.visiblePhoto = false;
     } else {
       this.record = record;
-      this.photo = record.imageRecord || '';
+      this.photo = record.imageRecord || "";
       this.visiblePhoto = true;
     }
   }
@@ -346,18 +350,14 @@ export class ListrecordsComponent {
     this.visibleError = false;
 
     // Update stock locally first for immediate response
-    const updatedRecords = this.records.map(r => 
-      r.idRecord === record.idRecord 
-        ? { ...r, stock: r.stock - 1 } 
-        : r
+    const updatedRecords = this.records.map((r) =>
+      r.idRecord === record.idRecord ? { ...r, stock: r.stock - 1 } : r
     );
-    
-    const updatedFilteredRecords = this.filteredRecords.map(r => 
-      r.idRecord === record.idRecord 
-        ? { ...r, stock: r.stock - 1 } 
-        : r
+
+    const updatedFilteredRecords = this.filteredRecords.map((r) =>
+      r.idRecord === record.idRecord ? { ...r, stock: r.stock - 1 } : r
     );
-    
+
     this.records = updatedRecords;
     this.filteredRecords = updatedFilteredRecords;
 
@@ -365,17 +365,15 @@ export class ListrecordsComponent {
       .addToCart(record)
       .pipe(
         finalize(() => (this.isAddingToCart = false)),
-        catchError(error => {
+        catchError((error) => {
           // Revert changes if there is an error
-          const revertedRecords = this.records.map(r => 
-            r.idRecord === record.idRecord 
-              ? { ...r, stock: r.stock + 1 } 
-              : r
+          const revertedRecords = this.records.map((r) =>
+            r.idRecord === record.idRecord ? { ...r, stock: r.stock + 1 } : r
           );
-          
+
           this.records = revertedRecords;
           this.filteredRecords = revertedRecords;
-          
+
           this.errorMessage = error.message || "Error adding to cart";
           this.visibleError = true;
           console.error("Error adding to cart:", error);
@@ -387,48 +385,48 @@ export class ListrecordsComponent {
           // The stock has already been updated locally
           // If the server returns a different stock, we update it
           if (updatedRecord && updatedRecord.stock !== undefined) {
-            this.records = this.records.map(r => 
-              r.idRecord === record.idRecord 
-                ? { ...r, stock: updatedRecord.stock } 
+            this.records = this.records.map((r) =>
+              r.idRecord === record.idRecord
+                ? { ...r, stock: updatedRecord.stock }
                 : r
             );
-            
-            this.filteredRecords = this.filteredRecords.map(r => 
-              r.idRecord === record.idRecord 
-                ? { ...r, stock: updatedRecord.stock } 
+
+            this.filteredRecords = this.filteredRecords.map((r) =>
+              r.idRecord === record.idRecord
+                ? { ...r, stock: updatedRecord.stock }
                 : r
             );
           }
-        }
+        },
       });
   }
 
   removeRecord(record: IRecord): void {
     if (!record.amount || this.isAddingToCart) return;
     this.isAddingToCart = true;
-    
+
     // Save the previous state so you can revert if necessary
     const prevAmount = record.amount;
-    
+
     // Update locally first for immediate response
-    const updatedRecords = this.records.map(r => 
-      r.idRecord === record.idRecord 
-        ? { 
-            ...r, 
+    const updatedRecords = this.records.map((r) =>
+      r.idRecord === record.idRecord
+        ? {
+            ...r,
             amount: Math.max(0, prevAmount - 1),
-            stock: (r.stock || 0) + 1 // Increase stock locally
-          } 
+            stock: (r.stock || 0) + 1, // Increase stock locally
+          }
         : r
     );
-    
+
     this.records = updatedRecords;
-    this.filteredRecords = this.filteredRecords.map(r => 
-      r.idRecord === record.idRecord 
-        ? { 
-            ...r, 
+    this.filteredRecords = this.filteredRecords.map((r) =>
+      r.idRecord === record.idRecord
+        ? {
+            ...r,
             amount: Math.max(0, prevAmount - 1),
-            stock: (r.stock || 0) + 1 // Increase stock locally
-          } 
+            stock: (r.stock || 0) + 1, // Increase stock locally
+          }
         : r
     );
 
@@ -440,26 +438,26 @@ export class ListrecordsComponent {
         }),
         catchError((error) => {
           // Revert local changes if there is an error
-          this.records = this.records.map(r => 
-            r.idRecord === record.idRecord 
-              ? { 
-                  ...r, 
+          this.records = this.records.map((r) =>
+            r.idRecord === record.idRecord
+              ? {
+                  ...r,
                   amount: prevAmount,
-                  stock: (r.stock || 0) - 1 // Reverse stock change
-                } 
+                  stock: (r.stock || 0) - 1, // Reverse stock change
+                }
               : r
           );
-          
-          this.filteredRecords = this.filteredRecords.map(r => 
-            r.idRecord === record.idRecord 
-              ? { 
-                  ...r, 
+
+          this.filteredRecords = this.filteredRecords.map((r) =>
+            r.idRecord === record.idRecord
+              ? {
+                  ...r,
                   amount: prevAmount,
-                  stock: (r.stock || 0) - 1 // Reverse stock change
-                } 
+                  stock: (r.stock || 0) - 1, // Reverse stock change
+                }
               : r
           );
-          
+
           this.errorMessage = error.message || "Error removing from cart";
           this.visibleError = true;
           console.error("Error removing from cart:", error);
@@ -471,24 +469,19 @@ export class ListrecordsComponent {
           // The stock has already been updated locally
           // If the server returns a different stock, we update it
           if (updatedRecord && updatedRecord.stock !== undefined) {
-            this.records = this.records.map(r => 
-              r.idRecord === record.idRecord 
-                ? { ...r, stock: updatedRecord.stock } 
+            this.records = this.records.map((r) =>
+              r.idRecord === record.idRecord
+                ? { ...r, stock: updatedRecord.stock }
                 : r
             );
-            
-            this.filteredRecords = this.filteredRecords.map(r => 
-              r.idRecord === record.idRecord 
-                ? { ...r, stock: updatedRecord.stock } 
+
+            this.filteredRecords = this.filteredRecords.map((r) =>
+              r.idRecord === record.idRecord
+                ? { ...r, stock: updatedRecord.stock }
                 : r
             );
           }
-          
-          // Synchronize the cart with the backend
-          if (this.userEmail) {
-            this.cartService.syncCartWithBackend(this.userEmail);
-          }
-        }
+        },
       });
   }
 
