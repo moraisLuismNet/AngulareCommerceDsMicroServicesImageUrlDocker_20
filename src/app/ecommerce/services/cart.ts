@@ -1,14 +1,14 @@
 import { Injectable, OnDestroy, inject } from "@angular/core";
 import { BehaviorSubject, Observable, of, Subject, throwError } from "rxjs";
 import { catchError, tap, takeUntil } from "rxjs/operators";
-import { UserService } from "src/app/services/UserService";
-import { IRecord, ICart } from "../EcommerceInterface";
-import { CartDetailService } from "./CartDetailService";
+import { UserService } from "src/app/services/users";
+import { IRecord, ICart } from "../ecommerce.interface";
+import { CartDetailService } from "./cart-detail";
 import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { environment } from "src/environments/environment";
-import { AuthGuard } from "src/app/guards/AuthGuardService";
-import { StockService } from "./StockService";
-import { CartEventsService } from "../../shared/services/CartEventsService";
+import { AuthGuard } from "src/app/guards/auth-guard";
+import { StockService } from "./stock";
+import { CartEventsService } from "../../shared/services/cart-events";
 
 @Injectable({
   providedIn: "root",

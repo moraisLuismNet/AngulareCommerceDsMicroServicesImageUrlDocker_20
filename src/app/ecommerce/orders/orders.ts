@@ -2,15 +2,16 @@ import { Component, inject, afterNextRender, ChangeDetectionStrategy, ChangeDete
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { OrderService } from '../services/OrderService';
-import { UserService } from 'src/app/services/UserService';
+import { OrderService } from '../services/order';
+import { UserService } from 'src/app/services/users';
 import { Subject, takeUntil } from 'rxjs';
-import { IOrder } from '../EcommerceInterface';
+import { IOrder } from '../ecommerce.interface';
 import { TableModule } from 'primeng/table';
 
 @Component({
     selector: 'app-orders',
-    templateUrl: './OrdersComponent.html',
+    standalone: true,
+    templateUrl: './orders.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         CommonModule,

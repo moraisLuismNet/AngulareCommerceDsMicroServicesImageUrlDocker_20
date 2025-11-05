@@ -19,16 +19,16 @@ import { DialogModule } from "primeng/dialog";
 import { InputTextModule } from "primeng/inputtext";
 import { InputNumberModule } from "primeng/inputnumber";
 import { CheckboxModule } from "primeng/checkbox";
-import { IRecord } from "../EcommerceInterface";
-import { RecordsService } from "../services/RecordsService";
-import { GroupsService } from "../services/GroupsService";
-import { StockService } from "../services/StockService";
-import { CartService } from "../services/CartService";
-import { UserService } from "src/app/services/UserService";
+import { IRecord } from "../ecommerce.interface";
+import { RecordsService } from "../services/records";
+import { GroupsService } from "../services/groups";
+import { StockService } from "../services/stock";
+import { CartService } from "../services/cart";
+import { UserService } from "src/app/services/users";
 
 @Component({
     selector: "app-records",
-    templateUrl: "./RecordsComponent.html",
+    templateUrl: "./records.html",
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         CommonModule,

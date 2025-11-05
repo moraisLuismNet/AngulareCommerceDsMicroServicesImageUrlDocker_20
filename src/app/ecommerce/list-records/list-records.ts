@@ -23,20 +23,20 @@ import { of, throwError } from "rxjs";
 import { finalize, switchMap, map, catchError, tap } from "rxjs/operators";
 
 // Services
-import { RecordsService } from "../services/RecordsService";
-import { GroupsService } from "../services/GroupsService";
-import { CartService } from "../services/CartService";
-import { CartDetailService } from "../services/CartDetailService";
-import { UserService } from "src/app/services/UserService";
-import { StockService } from "../services/StockService";
-import { AuthGuard } from "src/app/guards/AuthGuardService";
+import { RecordsService } from "../services/records";
+import { GroupsService } from "../services/groups";
+import { CartService } from "../services/cart";
+import { CartDetailService } from "../services/cart-detail";
+import { UserService } from "src/app/services/users";
+import { StockService } from "../services/stock";
+import { AuthGuard } from "src/app/guards/auth-guard";
 
 // Interfaces
-import { IRecord } from "../EcommerceInterface";
+import { IRecord } from "../ecommerce.interface";
 
 @Component({
-  selector: "app-listrecords",
-  templateUrl: "./ListrecordsComponent.html",
+  selector: 'app-list-records',
+  standalone: true,
   imports: [
     CommonModule,
     FormsModule,
@@ -44,12 +44,13 @@ import { IRecord } from "../EcommerceInterface";
     TableModule,
     ButtonModule,
     ConfirmDialogModule,
-    DialogModule,
+    DialogModule
   ],
-  providers: [ConfirmationService],
+  templateUrl: './list-records.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  providers: [ConfirmationService]
 })
-export class ListrecordsComponent {
+export class ListRecordsComponent {
   records: IRecord[] = [];
   filteredRecords: IRecord[] = [];
   searchText: string = "";

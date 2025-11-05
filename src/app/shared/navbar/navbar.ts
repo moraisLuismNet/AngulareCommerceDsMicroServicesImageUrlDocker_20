@@ -13,12 +13,12 @@ import { of } from "rxjs";
 import { filter, tap, switchMap } from "rxjs/operators";
 
 // Services
-import { UserService } from "src/app/services/UserService";
-import { CartService } from "src/app/ecommerce/services/CartService";
+import { UserService } from "src/app/services/users";
+import { CartService } from "src/app/ecommerce/services/cart";
 
 @Component({
   selector: "app-navbar",
-  templateUrl: "./NavbarComponent.html",
+  templateUrl: "./navbar.html",
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, RouterModule],
 })

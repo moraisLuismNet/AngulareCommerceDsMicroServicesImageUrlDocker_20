@@ -9,13 +9,13 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { DropdownModule } from 'primeng/dropdown';
-import { IGroup } from '../EcommerceInterface';
-import { GroupsService } from '../services/GroupsService';
-import { GenresService } from '../services/GenresService';
+import { IGroup } from '../ecommerce.interface';
+import { GroupsService } from '../services/groups';
+import { GenresService } from '../services/genres';
 
 @Component({
     selector: 'app-groups',
-    templateUrl: './GroupsComponent.html',
+    templateUrl: './groups.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         CommonModule,

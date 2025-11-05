@@ -1,7 +1,7 @@
 import { Component, inject, afterNextRender, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { OrderService } from '../services/OrderService';
-import { IOrder } from '../EcommerceInterface';
+import { OrderService } from '../services/order';
+import { IOrder } from '../ecommerce.interface';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TableModule } from 'primeng/table';
@@ -10,8 +10,8 @@ import { InputTextModule } from 'primeng/inputtext';
 
 @Component({
     selector: 'app-admin-orders',
-    templateUrl: './AdminOrdersComponent.html',
-    styleUrls: ['./AdminOrdersComponent.css'],
+    templateUrl: './admin-orders.html',
+    styleUrls: ['./admin-orders.css'],
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         CommonModule,

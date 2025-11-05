@@ -5,13 +5,13 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
-import { IRegister } from 'src/app/interfaces/RegisterInterface';
-import { AppService } from 'src/app/services/AppService';
+import { IRegister } from 'src/app/interfaces/register.interface';
+import { AppService } from 'src/app/services/app';
 
 @Component({
     selector: 'app-register',
-    templateUrl: './RegisterComponent.html',
-    styleUrls: ['./RegisterComponent.css'],
+    templateUrl: './register.html',
+    styleUrls: ['./register.css'],
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         CommonModule,

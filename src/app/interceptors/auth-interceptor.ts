@@ -3,7 +3,7 @@ import { HttpRequest, HttpHandler, HttpEvent, HttpInterceptor, HttpErrorResponse
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { Router } from '@angular/router';
-import { AuthGuard } from '../guards/AuthGuardService';
+import { AuthGuard } from '../guards/auth-guard';
 import { jwtDecode } from 'jwt-decode';
 
 @Injectable()

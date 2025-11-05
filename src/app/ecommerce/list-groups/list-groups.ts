@@ -8,12 +8,12 @@ import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DialogModule } from 'primeng/dialog';
-import { IGroup } from '../EcommerceInterface';
-import { GroupsService } from '../services/GroupsService';
-import { GenresService } from '../services/GenresService';
+import { IGroup } from '../ecommerce.interface';
+import { GroupsService } from '../services/groups';
+import { GenresService } from '../services/genres';
 
 @Component({
-    selector: 'app-listgroups',
+    selector: 'app-list-groups',
     imports: [
         CommonModule,
         FormsModule,
@@ -23,11 +23,11 @@ import { GenresService } from '../services/GenresService';
         ConfirmDialogModule,
         DialogModule
     ],
-    templateUrl: './ListgroupsComponent.html',
+    templateUrl: './list-groups.html',
     providers: [ConfirmationService],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ListgroupsComponent {
+export class ListGroupsComponent {
   @ViewChild('form') form!: NgForm;
   @ViewChild('fileInput') fileInput!: ElementRef;
   visibleError = false;

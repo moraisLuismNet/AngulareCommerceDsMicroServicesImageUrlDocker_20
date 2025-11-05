@@ -4,7 +4,7 @@ import { RouterModule } from '@angular/router';
 
 @Component({
     selector: 'app-ecommerce',
-    templateUrl: './EcommerceComponent.html',
+    templateUrl: './ecommerce.html',
     imports: [
         CommonModule,
         RouterModule

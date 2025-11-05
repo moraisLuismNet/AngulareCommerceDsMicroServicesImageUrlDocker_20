@@ -3,9 +3,9 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { UserService } from 'src/app/services/UserService';
-import { CartService } from '../services/CartService';
-import { ICart } from '../EcommerceInterface';
+import { UserService } from 'src/app/services/users';
+import { CartService } from '../services/cart';
+import { ICart } from '../ecommerce.interface';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { TagModule } from 'primeng/tag';
@@ -15,8 +15,8 @@ import { DialogModule } from 'primeng/dialog';
 
 @Component({
     selector: 'app-carts',
-    templateUrl: './CartsComponent.html',
-    styleUrls: ['./CartsComponent.css'],
+    templateUrl: './carts.html',
+    styleUrls: ['./carts.css'],
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         CommonModule,

@@ -10,11 +10,11 @@ import {
   switchMap,
 } from 'rxjs';
 import { environment } from 'src/environments/environment';
-import { AuthGuard } from '../../guards/AuthGuardService';
-import { ICartDetail, IRecord } from '../EcommerceInterface';
-import { UserService } from 'src/app/services/UserService';
-import { StockService } from './StockService';
-import { RecordsService } from './RecordsService';
+import { AuthGuard } from '../../guards/auth-guard';
+import { ICartDetail, IRecord } from '../ecommerce.interface';
+import { UserService } from 'src/app/services/users';
+import { StockService } from './stock';
+import { RecordsService } from './records';
 
 @Injectable({
   providedIn: 'root',

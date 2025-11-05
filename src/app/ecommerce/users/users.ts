@@ -3,8 +3,8 @@ import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { IUser } from "../EcommerceInterface";
-import { UsersService } from "../services/UsersService";
+import { IUser } from "../ecommerce.interface";
+import { UsersService } from "../services/users";
 import { ConfirmationService, MessageService } from "primeng/api";
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
@@ -15,7 +15,7 @@ import { TooltipModule } from 'primeng/tooltip';
 
 @Component({
     selector: "app-users",
-    templateUrl: "./UsersComponent.html",
+    templateUrl: "./users.html",
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         CommonModule,

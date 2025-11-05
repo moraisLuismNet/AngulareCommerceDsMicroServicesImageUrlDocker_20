@@ -6,16 +6,16 @@ import { Router, RouterModule } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import { MessagesModule } from 'primeng/messages';
 import { ToastModule } from 'primeng/toast';
-import { ILogin, ILoginResponse } from 'src/app/interfaces/LoginInterface';
-import { AppService } from 'src/app/services/AppService';
-import { AuthGuard } from 'src/app/guards/AuthGuardService';
-import { UserService } from 'src/app/services/UserService';
+import { ILogin, ILoginResponse } from 'src/app/interfaces/login.interface';
+import { AppService } from 'src/app/services/app';
+import { AuthGuard } from 'src/app/guards/auth-guard';
+import { UserService } from 'src/app/services/users';
 import { jwtDecode } from 'jwt-decode';
 
 @Component({
     selector: 'app-login',
-    templateUrl: './LoginComponent.html',
-    styleUrls: ['./LoginComponent.css'],
+    templateUrl: './login.html',
+    styleUrls: ['./login.css'],
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         CommonModule,

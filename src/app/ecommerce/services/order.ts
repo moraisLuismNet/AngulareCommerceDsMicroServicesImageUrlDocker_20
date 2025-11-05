@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
 import { catchError, map, Observable, of, tap } from 'rxjs';
-import { IOrder } from '../EcommerceInterface';
+import { IOrder } from '../ecommerce.interface';
 
 @Injectable({
   providedIn: 'root',

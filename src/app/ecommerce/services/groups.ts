@@ -3,8 +3,8 @@ import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams } from '@angular
 import { Observable, catchError, of, throwError } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
-import { AuthGuard } from 'src/app/guards/AuthGuardService';
-import { IGroup } from '../EcommerceInterface';
+import { AuthGuard } from 'src/app/guards/auth-guard';
+import { IGroup } from '../ecommerce.interface';
 
 @Injectable({
   providedIn: 'root',

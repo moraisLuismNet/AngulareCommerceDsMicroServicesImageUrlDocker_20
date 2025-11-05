@@ -1,7 +1,7 @@
 import { Injectable, OnDestroy, inject } from '@angular/core';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { Router } from '@angular/router';
-import { CartEventsService } from '../shared/services/CartEventsService';
+import { CartEventsService } from '../shared/services/cart-events';
 
 @Injectable({
   providedIn: 'root',

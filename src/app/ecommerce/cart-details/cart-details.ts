@@ -24,25 +24,25 @@ import { ConfirmDialogModule } from "primeng/confirmdialog";
 import { DialogModule } from "primeng/dialog";
 
 // Services
-import { UserService } from "src/app/services/UserService";
-import { CartDetailService } from "../services/CartDetailService";
-import { CartService } from "../services/CartService";
-import { OrderService } from "../services/OrderService";
+import { UserService } from "src/app/services/users";
+import { CartDetailService } from "../services/cart-detail";
+import { CartService } from "../services/cart";
+import { OrderService } from "../services/order";
 
 // Guards
-import { AuthGuard } from "src/app/guards/AuthGuardService";
+import { AuthGuard } from "src/app/guards/auth-guard";
 
 // Interfaces
 import {
   ICartDetail,
   IRecord,
   ExtendedCartDetail,
-} from "../EcommerceInterface";
+} from "../ecommerce.interface";
 
 @Component({
   selector: "app-cart-details",
-  templateUrl: "./CartDetailsComponent.html",
-  styleUrls: ["./CartDetailsComponent.css"],
+  templateUrl: "./cart-details.html",
+  styleUrls: ["./cart-details.css"],
   imports: [
     CommonModule,
     FormsModule,

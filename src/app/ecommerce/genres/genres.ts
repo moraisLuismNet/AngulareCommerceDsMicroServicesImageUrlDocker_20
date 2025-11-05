@@ -8,12 +8,12 @@ import { ButtonModule } from 'primeng/button';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
-import { IGenre } from '../EcommerceInterface';
-import { GenresService } from '../services/GenresService';
+import { IGenre } from '../ecommerce.interface';
+import { GenresService } from '../services/genres';
 
 @Component({
     selector: 'app-genres',
-    templateUrl: './GenresComponent.html',
+    templateUrl: './genres.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         CommonModule,

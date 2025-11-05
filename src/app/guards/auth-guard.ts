@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { ILoginResponse } from '../interfaces/LoginInterface';
+import { ILoginResponse } from '../interfaces/login.interface';
 import { jwtDecode } from 'jwt-decode';
 
 @Injectable({
