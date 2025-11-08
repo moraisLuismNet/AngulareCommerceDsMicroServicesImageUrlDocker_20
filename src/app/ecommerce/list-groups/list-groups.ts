@@ -1,4 +1,13 @@
-import { Component, ViewChild, ElementRef, inject, afterNextRender, ChangeDetectionStrategy, ChangeDetectorRef, DestroyRef } from '@angular/core';
+import {
+  Component,
+  ViewChild,
+  ElementRef,
+  inject,
+  afterNextRender,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  DestroyRef,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
@@ -13,21 +22,21 @@ import { GroupsService } from '../services/groups';
 import { GenresService } from '../services/genres';
 
 @Component({
-    selector: 'app-list-groups',
-    imports: [
-        CommonModule,
-        FormsModule,
-        RouterModule,
-        TableModule,
-        ButtonModule,
-        ConfirmDialogModule,
-        DialogModule
-    ],
-    templateUrl: './list-groups.html',
-    providers: [ConfirmationService],
-    changeDetection: ChangeDetectionStrategy.OnPush
+  selector: 'app-listgroups',
+  imports: [
+    CommonModule,
+    FormsModule,
+    RouterModule,
+    TableModule,
+    ButtonModule,
+    ConfirmDialogModule,
+    DialogModule,
+  ],
+  templateUrl: './list-groups.html',
+  providers: [ConfirmationService],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ListGroupsComponent {
+export class ListgroupsComponent {
   @ViewChild('form') form!: NgForm;
   @ViewChild('fileInput') fileInput!: ElementRef;
   visibleError = false;
@@ -72,58 +81,60 @@ export class ListGroupsComponent {
   }
 
   getGroups() {
-    this.groupsService.getGroups().pipe(
-      takeUntilDestroyed(this.destroyRef)
-    ).subscribe({
-      next: (data: any) => {
-        this.visibleError = false;
+    this.groupsService
+      .getGroups()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (data: any) => {
+          this.visibleError = false;
 
-        // Handle different possible response formats
-        if (Array.isArray(data)) {
-          this.groups = data;
-        } else if (data && typeof data === 'object') {
-          // Check for $values property safely
-          if (data.hasOwnProperty('$values')) {
-            this.groups = Array.isArray(data.$values) ? data.$values : [];
-          } else if (data.hasOwnProperty('data')) {
-            this.groups = Array.isArray(data.data) ? data.data : [];
+          // Handle different possible response formats
+          if (Array.isArray(data)) {
+            this.groups = data;
+          } else if (data && typeof data === 'object') {
+            // Check for $values property safely
+            if (data.hasOwnProperty('$values')) {
+              this.groups = Array.isArray(data.$values) ? data.$values : [];
+            } else if (data.hasOwnProperty('data')) {
+              this.groups = Array.isArray(data.data) ? data.data : [];
+            } else {
+              // If it's an object but not in the expected format, try to convert it to an array
+              this.groups = Object.values(data);
+            }
           } else {
-            // If it's an object but not in the expected format, try to convert it to an array
-            this.groups = Object.values(data);
+            this.groups = [];
+            console.warn('Unexpected data format:', data);
           }
-        } else {
-          this.groups = [];
-          console.warn('Unexpected data format:', data);
-        }
 
-        this.filterGroups();
-        this.cdr.markForCheck();
-      },
-      error: (err: any) => {
-        console.error('Error loading groups:', err);
-        this.visibleError = true;
-        this.controlError(err);
-        this.groups = [];
-        this.filteredGroups = [];
-        this.cdr.markForCheck();
-      },
-    });
+          this.filterGroups();
+          this.cdr.markForCheck();
+        },
+        error: (err: any) => {
+          console.error('Error loading groups:', err);
+          this.visibleError = true;
+          this.controlError(err);
+          this.groups = [];
+          this.filteredGroups = [];
+          this.cdr.markForCheck();
+        },
+      });
   }
 
   getGenres() {
-    this.genresService.getGenres().pipe(
-      takeUntilDestroyed(this.destroyRef)
-    ).subscribe({
-      next: (data) => {
-        this.genres = data;
-        this.cdr.markForCheck();
-      },
-      error: (err) => {
-        this.visibleError = true;
-        this.controlError(err);
-        this.cdr.markForCheck();
-      },
-    });
+    this.genresService
+      .getGenres()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (data) => {
+          this.genres = data;
+          this.cdr.markForCheck();
+        },
+        error: (err) => {
+          this.visibleError = true;
+          this.controlError(err);
+          this.cdr.markForCheck();
+        },
+      });
   }
 
   controlError(err: any) {
@@ -137,7 +148,6 @@ export class ListGroupsComponent {
   }
 
   filterGroups() {
-    
     if (!Array.isArray(this.groups)) {
       console.warn('Groups is not an array:', this.groups);
       this.groups = [];
@@ -151,7 +161,6 @@ export class ListGroupsComponent {
         const groupName = group.nameGroup ? group.nameGroup.toLowerCase() : '';
         return groupName.includes(searchText);
       });
-      
     } catch (error) {
       console.error('Error filtering groups:', error);
       this.filteredGroups = [];
@@ -175,5 +184,4 @@ export class ListGroupsComponent {
   loadRecords(idGroup: string): void {
     this.router.navigate(['/listrecords', idGroup]);
   }
-
 }

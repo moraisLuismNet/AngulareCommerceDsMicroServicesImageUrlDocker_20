@@ -29,7 +29,7 @@ AngulareCommerceDsMicroServicesImageUrlDocker_20/
 │   │   │   ├───list-groups.html     
 │   │   │   └───list-groups.ts  
 │   │   ├───list-records/  
-│   │   │   ├───list-records.html   
+│   │   │   ├───listrecords.html   
 │   │   │   └───list-records.ts  
 │   │   ├───orders/  
 │   │   │   ├───orders.html  
@@ -42,8 +42,8 @@ AngulareCommerceDsMicroServicesImageUrlDocker_20/
 │   │   │   ├───cart-detail.ts  
 │   │   │   ├───genres.ts  
 │   │   │   ├───groups.ts  
-│   │   │   ├───orderService.ts  
-│   │   │   ├───Records.ts  
+│   │   │   ├───order.ts  
+│   │   │   ├───records.ts  
 │   │   │   ├───stock.ts  
 │   │   │   └───users.ts  
 │   │   ├───users/  

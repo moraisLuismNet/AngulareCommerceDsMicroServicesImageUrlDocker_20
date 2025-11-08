@@ -1,4 +1,11 @@
-import { Component, inject, afterNextRender, ChangeDetectionStrategy, ChangeDetectorRef, DestroyRef } from '@angular/core';
+import {
+  Component,
+  inject,
+  afterNextRender,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  DestroyRef,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -9,17 +16,12 @@ import { IRegister } from 'src/app/interfaces/register.interface';
 import { AppService } from 'src/app/services/app';
 
 @Component({
-    selector: 'app-register',
-    templateUrl: './register.html',
-    styleUrls: ['./register.css'],
-    changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [
-        CommonModule,
-        FormsModule,
-        RouterModule,
-        ToastModule
-    ],
-    providers: [MessageService]
+  selector: 'app-register',
+  templateUrl: './register.html',
+  styleUrls: ['./register.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [CommonModule, FormsModule, RouterModule, ToastModule],
+  providers: [MessageService],
 })
 export class RegisterComponent {
   usuario: IRegister = { email: '', password: '' };
@@ -36,37 +38,36 @@ export class RegisterComponent {
     afterNextRender(() => {
       // Any DOM-dependent initialization can go here
     });
-
   }
 
   onSubmit(form: any) {
     if (form.valid) {
-      this.appService.register(this.usuario).pipe(
-        takeUntilDestroyed(this.destroyRef)
-      ).subscribe({
-        next: () => {
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Registration successful',
-            detail: 'User successfully registered',
-          });
-          this.cdr.markForCheck();
+      this.appService
+        .register(this.usuario)
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe({
+          next: () => {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Registration successful',
+              detail: 'User successfully registered',
+            });
+            this.cdr.markForCheck();
 
-          setTimeout(() => {
-            this.router.navigate(['/login']);
-          }, 1500); // Wait 1.5 seconds before redirecting
-        },
-        error: (err) => {
-          console.error('Error registering user:', err);
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Registration error',
-            detail: 'The user could not be registered. Please try again.',
-          });
-          this.cdr.markForCheck();
-        },
-      });
+            setTimeout(() => {
+              this.router.navigate(['/login']);
+            }, 1500); // Wait 1.5 seconds before redirecting
+          },
+          error: (err) => {
+            console.error('Error registering user:', err);
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Registration error',
+              detail: 'The user could not be registered. Please try again.',
+            });
+            this.cdr.markForCheck();
+          },
+        });
     }
   }
-
 }

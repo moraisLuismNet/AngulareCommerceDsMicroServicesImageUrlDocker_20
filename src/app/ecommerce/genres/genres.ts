@@ -1,4 +1,12 @@
-import { Component, ViewChild, inject, afterNextRender, ChangeDetectionStrategy, ChangeDetectorRef, DestroyRef } from '@angular/core';
+import {
+  Component,
+  ViewChild,
+  inject,
+  afterNextRender,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  DestroyRef,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NgForm, FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -12,19 +20,19 @@ import { IGenre } from '../ecommerce.interface';
 import { GenresService } from '../services/genres';
 
 @Component({
-    selector: 'app-genres',
-    templateUrl: './genres.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [
-        CommonModule,
-        FormsModule,
-        TableModule,
-        ButtonModule,
-        ConfirmDialogModule,
-        DialogModule,
-        InputTextModule
-    ],
-    providers: [ConfirmationService]
+  selector: 'app-genres',
+  templateUrl: './genres.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [
+    CommonModule,
+    FormsModule,
+    TableModule,
+    ButtonModule,
+    ConfirmDialogModule,
+    DialogModule,
+    InputTextModule,
+  ],
+  providers: [ConfirmationService],
 })
 export class GenresComponent {
   private readonly genresService = inject(GenresService);
@@ -53,63 +61,65 @@ export class GenresComponent {
     afterNextRender(() => {
       // Any DOM-dependent initialization can go here
     });
-
   }
 
   getGenres() {
-    this.genresService.getGenres().pipe(
-      takeUntilDestroyed(this.destroyRef)
-    ).subscribe({
-      next: (data: any) => {
-        this.visibleError = false;
-        
-        // The API returns the array directly, no need to access .$values
-        this.genres = Array.isArray(data) ? data : [];
-        this.filteredGenres = [...this.genres]; // Initialize `filteredGenres` as a copy of `genres`
-        this.cdr.markForCheck();
-      },
-      error: (err) => {
-        console.error('Error:', err);
-        this.visibleError = true;
-        this.controlError(err);
-        this.cdr.markForCheck();
-      },
-    });
+    this.genresService
+      .getGenres()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (data: any) => {
+          this.visibleError = false;
+
+          // The API returns the array directly, no need to access .$values
+          this.genres = Array.isArray(data) ? data : [];
+          this.filteredGenres = [...this.genres]; // Initialize `filteredGenres` as a copy of `genres`
+          this.cdr.markForCheck();
+        },
+        error: (err) => {
+          console.error('Error:', err);
+          this.visibleError = true;
+          this.controlError(err);
+          this.cdr.markForCheck();
+        },
+      });
   }
   save() {
     if (this.genre.idMusicGenre === 0) {
-      this.genresService.addGenre(this.genre).pipe(
-        takeUntilDestroyed(this.destroyRef)
-      ).subscribe({
-        next: (data) => {
-          this.visibleError = false;
-          this.form.reset();
-          this.getGenres();
-          this.cdr.markForCheck();
-        },
-        error: (err) => {
-          console.log(err);
-          this.visibleError = true;
-          this.controlError(err);
-          this.cdr.markForCheck();
-        },
-      });
+      this.genresService
+        .addGenre(this.genre)
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe({
+          next: (data) => {
+            this.visibleError = false;
+            this.form.reset();
+            this.getGenres();
+            this.cdr.markForCheck();
+          },
+          error: (err) => {
+            console.log(err);
+            this.visibleError = true;
+            this.controlError(err);
+            this.cdr.markForCheck();
+          },
+        });
     } else {
-      this.genresService.updateGenre(this.genre).pipe(
-        takeUntilDestroyed(this.destroyRef)
-      ).subscribe({
-        next: (data) => {
-          this.visibleError = false;
-          this.cancelEdition();
-          this.form.reset();
-          this.getGenres();
-          this.cdr.markForCheck();
-        },
-        error: (err) => {
-          this.visibleError = true;
-          this.controlError(err);
-        },
-      });
+      this.genresService
+        .updateGenre(this.genre)
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe({
+          next: (data) => {
+            this.visibleError = false;
+            this.cancelEdition();
+            this.form.reset();
+            this.getGenres();
+            this.cdr.markForCheck();
+          },
+          error: (err) => {
+            this.visibleError = true;
+            this.controlError(err);
+          },
+        });
     }
   }
 
@@ -138,22 +148,23 @@ export class GenresComponent {
   }
 
   deleteGenre(id: number) {
-    this.genresService.deleteGenre(id).pipe(
-      takeUntilDestroyed(this.destroyRef)
-    ).subscribe({
-      next: (data) => {
-        this.visibleError = false;
-        this.form.reset({
-          name: '',
-        });
-        this.getGenres();
-        this.cdr.markForCheck();
-      },
-      error: (err) => {
-        this.visibleError = true;
-        this.controlError(err);
-      },
-    });
+    this.genresService
+      .deleteGenre(id)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (data) => {
+          this.visibleError = false;
+          this.form.reset({
+            name: '',
+          });
+          this.getGenres();
+          this.cdr.markForCheck();
+        },
+        error: (err) => {
+          this.visibleError = true;
+          this.controlError(err);
+        },
+      });
   }
 
   filterGenres() {
@@ -174,5 +185,4 @@ export class GenresComponent {
       this.errorMessage = 'An unexpected error has occurred';
     }
   }
-
 }

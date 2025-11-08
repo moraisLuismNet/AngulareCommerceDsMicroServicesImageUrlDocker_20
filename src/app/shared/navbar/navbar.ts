@@ -5,20 +5,20 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   DestroyRef,
-} from "@angular/core";
-import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
-import { CommonModule } from "@angular/common";
-import { Router, RouterModule, NavigationEnd } from "@angular/router";
-import { of } from "rxjs";
-import { filter, tap, switchMap } from "rxjs/operators";
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { CommonModule } from '@angular/common';
+import { Router, RouterModule, NavigationEnd } from '@angular/router';
+import { of } from 'rxjs';
+import { filter, tap, switchMap } from 'rxjs/operators';
 
 // Services
-import { UserService } from "src/app/services/users";
-import { CartService } from "src/app/ecommerce/services/cart";
+import { UserService } from 'src/app/services/user';
+import { CartService } from 'src/app/ecommerce/services/cart';
 
 @Component({
-  selector: "app-navbar",
-  templateUrl: "./navbar.html",
+  selector: 'app-navbar',
+  templateUrl: './navbar.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, RouterModule],
 })
@@ -27,7 +27,7 @@ export class NavbarComponent {
   role: string | null = null;
   cartItemsCount: number = 0;
   cartTotal: number = 0;
-  currentRoute: string = "";
+  currentRoute: string = '';
   cartEnabled: boolean = true;
 
   private readonly userService = inject(UserService);
@@ -147,53 +147,53 @@ export class NavbarComponent {
   }
 
   isAdmin(): boolean {
-    return this.role === "Admin";
+    return this.role === 'Admin';
   }
 
   isListGroupsPage(): boolean {
     return (
-      this.currentRoute.includes("/listgroups") || this.currentRoute === "/"
+      this.currentRoute.includes('/listgroups') || this.currentRoute === '/'
     );
   }
 
   isOrdersPage(): boolean {
     return (
-      this.currentRoute.includes("/admin-orders") ||
-      this.currentRoute.includes("/orders")
+      this.currentRoute.includes('/admin-orders') ||
+      this.currentRoute.includes('/orders')
     );
   }
 
   isGenresPage(): boolean {
-    return this.currentRoute.includes("/genres");
+    return this.currentRoute.includes('/genres');
   }
 
   isGroupsPage(): boolean {
-    return this.currentRoute.includes("/groups");
+    return this.currentRoute.includes('/groups');
   }
 
   isRecordsPage(): boolean {
-    return this.currentRoute.includes("/records");
+    return this.currentRoute.includes('/records');
   }
 
   isCartsPage(): boolean {
-    return this.currentRoute.includes("/carts");
+    return this.currentRoute.includes('/carts');
   }
 
   isUsersPage(): boolean {
-    return this.currentRoute.includes("/users");
+    return this.currentRoute.includes('/users');
   }
 
   logout(): void {
     this.cartService.resetCart();
-    sessionStorage.removeItem("user");
-    sessionStorage.removeItem("role");
+    sessionStorage.removeItem('user');
+    sessionStorage.removeItem('role');
     this.emailUser = null;
     this.role = null;
     this.cdr.markForCheck();
-    this.router.navigate(["/login"]);
+    this.router.navigate(['/login']);
   }
 
   isLoginPage(): boolean {
-    return this.currentRoute.includes("/login");
+    return this.currentRoute.includes('/login');
   }
 }

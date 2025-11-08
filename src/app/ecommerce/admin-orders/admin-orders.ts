@@ -1,4 +1,10 @@
-import { Component, inject, afterNextRender, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import {
+  Component,
+  inject,
+  afterNextRender,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { OrderService } from '../services/order';
 import { IOrder } from '../ecommerce.interface';
@@ -9,18 +15,18 @@ import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 
 @Component({
-    selector: 'app-admin-orders',
-    templateUrl: './admin-orders.html',
-    styleUrls: ['./admin-orders.css'],
-    changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [
-        CommonModule,
-        FormsModule,
-        TableModule,
-        ButtonModule,
-        InputTextModule,
-        DatePipe
-    ]
+  selector: 'app-admin-orders',
+  templateUrl: './admin-orders.html',
+  styleUrls: ['./admin-orders.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [
+    CommonModule,
+    FormsModule,
+    TableModule,
+    ButtonModule,
+    InputTextModule,
+    DatePipe,
+  ],
 })
 export class AdminOrdersComponent {
   orders: IOrder[] = [];
@@ -38,30 +44,30 @@ export class AdminOrdersComponent {
       // Any DOM-dependent initialization can go here
     });
 
-
     // Initial data load
     this.loadAllOrders();
   }
 
   loadAllOrders(): void {
     this.loading = true;
-    this.orderService.getAllOrders().pipe(
-      takeUntilDestroyed()
-    ).subscribe({
-      next: (orders) => {
-        this.orders = orders;
-        this.filteredOrders = [...orders];
-        this.loading = false;
-        this.cdr.markForCheck();
-      },
-      error: (err) => {
-        console.error('Error loading all orders:', err);
-        this.orders = [];
-        this.filteredOrders = [];
-        this.loading = false;
-        this.cdr.markForCheck();
-      },
-    });
+    this.orderService
+      .getAllOrders()
+      .pipe(takeUntilDestroyed())
+      .subscribe({
+        next: (orders) => {
+          this.orders = orders;
+          this.filteredOrders = [...orders];
+          this.loading = false;
+          this.cdr.markForCheck();
+        },
+        error: (err) => {
+          console.error('Error loading all orders:', err);
+          this.orders = [];
+          this.filteredOrders = [];
+          this.loading = false;
+          this.cdr.markForCheck();
+        },
+      });
   }
 
   toggleOrderDetails(orderId: number): void {
@@ -95,6 +101,4 @@ export class AdminOrdersComponent {
           new Date(order.orderDate).toLocaleDateString().includes(searchLower))
     );
   }
-
-
 }

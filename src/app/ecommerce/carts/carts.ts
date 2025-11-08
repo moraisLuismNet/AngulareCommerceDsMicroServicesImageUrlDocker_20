@@ -1,9 +1,15 @@
-import { Component, inject, afterNextRender, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import {
+  Component,
+  inject,
+  afterNextRender,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { UserService } from 'src/app/services/users';
+import { UserService } from 'src/app/services/user';
 import { CartService } from '../services/cart';
 import { ICart } from '../ecommerce.interface';
 import { TableModule } from 'primeng/table';
@@ -14,21 +20,21 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DialogModule } from 'primeng/dialog';
 
 @Component({
-    selector: 'app-carts',
-    templateUrl: './carts.html',
-    styleUrls: ['./carts.css'],
-    changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [
-        CommonModule,
-        FormsModule,
-        RouterModule,
-        TableModule,
-        ButtonModule,
-        TagModule,
-        TooltipModule,
-        ConfirmDialogModule,
-        DialogModule
-    ]
+  selector: 'app-carts',
+  templateUrl: './carts.html',
+  styleUrls: ['./carts.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [
+    CommonModule,
+    FormsModule,
+    RouterModule,
+    TableModule,
+    ButtonModule,
+    TagModule,
+    TooltipModule,
+    ConfirmDialogModule,
+    DialogModule,
+  ],
 })
 export class CartsComponent {
   carts: ICart[] = [];
@@ -59,30 +65,31 @@ export class CartsComponent {
     this.cdr.markForCheck();
 
     if (this.isAdmin) {
-      this.cartService.getAllCarts().pipe(
-        takeUntilDestroyed()
-      ).subscribe({
-        next: (data: any) => {
-          // Extracts values ​​correctly from the response object
-          const receivedCarts = data.$values || data;
+      this.cartService
+        .getAllCarts()
+        .pipe(takeUntilDestroyed())
+        .subscribe({
+          next: (data: any) => {
+            // Extracts values ​​correctly from the response object
+            const receivedCarts = data.$values || data;
 
-          // Ensures that it is always an array
-          this.carts = Array.isArray(receivedCarts)
-            ? receivedCarts
-            : [receivedCarts];
+            // Ensures that it is always an array
+            this.carts = Array.isArray(receivedCarts)
+              ? receivedCarts
+              : [receivedCarts];
 
-          this.filteredCarts = [...this.carts];
-          this.loading = false;
-          this.cdr.markForCheck();
-        },
-        error: (error) => {
-          console.error('Error:', error);
-          this.errorMessage = 'Error loading carts';
-          this.visibleError = true;
-          this.loading = false;
-          this.cdr.markForCheck();
-        },
-      });
+            this.filteredCarts = [...this.carts];
+            this.loading = false;
+            this.cdr.markForCheck();
+          },
+          error: (error) => {
+            console.error('Error:', error);
+            this.errorMessage = 'Error loading carts';
+            this.visibleError = true;
+            this.loading = false;
+            this.cdr.markForCheck();
+          },
+        });
     } else {
       const userEmail = this.userService.email;
       if (!userEmail) {
@@ -93,22 +100,23 @@ export class CartsComponent {
         return;
       }
 
-      this.cartService.getCart(userEmail).pipe(
-        takeUntilDestroyed()
-      ).subscribe({
-        next: (data) => {
-          this.carts = Array.isArray(data) ? data : [data];
-          this.filteredCarts = [...this.carts];
-          this.loading = false;
-          this.cdr.markForCheck();
-        },
-        error: (error) => {
-          this.errorMessage = 'Error loading your cart';
-          this.visibleError = true;
-          this.loading = false;
-          this.cdr.markForCheck();
-        },
-      });
+      this.cartService
+        .getCart(userEmail)
+        .pipe(takeUntilDestroyed())
+        .subscribe({
+          next: (data) => {
+            this.carts = Array.isArray(data) ? data : [data];
+            this.filteredCarts = [...this.carts];
+            this.loading = false;
+            this.cdr.markForCheck();
+          },
+          error: (error) => {
+            this.errorMessage = 'Error loading your cart';
+            this.visibleError = true;
+            this.loading = false;
+            this.cdr.markForCheck();
+          },
+        });
     }
   }
 
@@ -142,9 +150,7 @@ export class CartsComponent {
       ? this.cartService.enableCart(email)
       : this.cartService.disableCart(email);
 
-    operation.pipe(
-      takeUntilDestroyed()
-    ).subscribe({
+    operation.pipe(takeUntilDestroyed()).subscribe({
       next: (updatedCart) => {
         // Update cart locally
         const cartIndex = this.carts.findIndex((c) => c.userEmail === email);
@@ -168,5 +174,4 @@ export class CartsComponent {
       },
     });
   }
-
 }

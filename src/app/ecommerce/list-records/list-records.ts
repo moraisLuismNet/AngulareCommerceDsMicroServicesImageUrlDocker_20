@@ -5,38 +5,38 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   DestroyRef,
-} from "@angular/core";
-import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
-import { CommonModule } from "@angular/common";
-import { FormsModule } from "@angular/forms";
-import { RouterModule, ActivatedRoute, Router } from "@angular/router";
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 
 // PrimeNG Modules
-import { TableModule } from "primeng/table";
-import { ButtonModule } from "primeng/button";
-import { ConfirmDialogModule } from "primeng/confirmdialog";
-import { DialogModule } from "primeng/dialog";
-import { ConfirmationService } from "primeng/api";
+import { TableModule } from 'primeng/table';
+import { ButtonModule } from 'primeng/button';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { DialogModule } from 'primeng/dialog';
+import { ConfirmationService } from 'primeng/api';
 
 // RxJS
-import { of, throwError } from "rxjs";
-import { finalize, switchMap, map, catchError, tap } from "rxjs/operators";
+import { of, throwError } from 'rxjs';
+import { finalize, switchMap, map, catchError, tap } from 'rxjs/operators';
 
 // Services
-import { RecordsService } from "../services/records";
-import { GroupsService } from "../services/groups";
-import { CartService } from "../services/cart";
-import { CartDetailService } from "../services/cart-detail";
-import { UserService } from "src/app/services/users";
-import { StockService } from "../services/stock";
-import { AuthGuard } from "src/app/guards/auth-guard";
+import { RecordsService } from '../services/records';
+import { GroupsService } from '../services/groups';
+import { CartService } from '../services/cart';
+import { CartDetailService } from '../services/cart-detail';
+import { UserService } from 'src/app/services/user';
+import { StockService } from '../services/stock';
+import { AuthGuard } from 'src/app/guards/auth-guard';
 
 // Interfaces
-import { IRecord } from "../ecommerce.interface";
+import { IRecord } from '../ecommerce.interface';
 
 @Component({
-  selector: 'app-list-records',
-  standalone: true,
+  selector: 'app-listrecords',
+  templateUrl: './list-records.html',
   imports: [
     CommonModule,
     FormsModule,
@@ -44,23 +44,22 @@ import { IRecord } from "../ecommerce.interface";
     TableModule,
     ButtonModule,
     ConfirmDialogModule,
-    DialogModule
+    DialogModule,
   ],
-  templateUrl: './list-records.html',
+  providers: [ConfirmationService],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [ConfirmationService]
 })
-export class ListRecordsComponent {
+export class ListrecordsComponent {
   records: IRecord[] = [];
   filteredRecords: IRecord[] = [];
-  searchText: string = "";
+  searchText: string = '';
   cart: IRecord[] = [];
   groupId: string | null = null;
-  groupName: string = "";
-  errorMessage: string = "";
+  groupName: string = '';
+  errorMessage: string = '';
   visibleError: boolean = false;
   visiblePhoto: boolean = false;
-  photo: string = "";
+  photo: string = '';
   cartItemsCount: number = 0;
   isAddingToCart = false;
   loading: boolean = false;
@@ -70,15 +69,15 @@ export class ListRecordsComponent {
 
   record: IRecord = {
     idRecord: 0,
-    titleRecord: "",
+    titleRecord: '',
     yearOfPublication: null,
     imageRecord: null,
     price: 0,
     stock: 0,
     discontinued: false,
     groupId: null,
-    groupName: "",
-    nameGroup: "",
+    groupName: '',
+    nameGroup: '',
   };
   userEmail: string | null = null;
 
@@ -99,12 +98,12 @@ export class ListRecordsComponent {
     this.route.paramMap
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((params) => {
-        const idGroup = params.get("idGroup");
+        const idGroup = params.get('idGroup');
         if (idGroup) {
           this.groupId = idGroup;
           this.loadRecords(idGroup);
         } else {
-          this.errorMessage = "No group ID provided";
+          this.errorMessage = 'No group ID provided';
           this.visibleError = true;
         }
       });
@@ -133,7 +132,7 @@ export class ListRecordsComponent {
         this.cartEnabled = status.enabled;
       },
       error: (error) => {
-        console.error("Error checking cart status:", error);
+        console.error('Error checking cart status:', error);
         this.cartEnabled = true;
       },
     });
@@ -206,18 +205,18 @@ export class ListRecordsComponent {
 
   confirm(): void {
     this.confirmationService.confirm({
-      message: "Are you sure you want to continue?",
+      message: 'Are you sure you want to continue?',
       accept: () => {},
     });
   }
 
   isLoggedIn(): boolean {
-    return !!sessionStorage.getItem("user");
+    return !!sessionStorage.getItem('user');
   }
 
   loadRecords(idGroup: string): void {
     this.loading = true;
-    this.errorMessage = "";
+    this.errorMessage = '';
     this.visibleError = false;
 
     // First we synchronize the cart with the backend
@@ -236,7 +235,7 @@ export class ListRecordsComponent {
           // Initialize stock values in the stock service
           if (records && records.length > 0) {
             records.forEach((record) => {
-              if (record.idRecord && typeof record.stock === "number") {
+              if (record.idRecord && typeof record.stock === 'number') {
                 this.stockService.updateStock(record.idRecord, record.stock);
               }
             });
@@ -244,7 +243,7 @@ export class ListRecordsComponent {
         }),
         switchMap((records: IRecord[]) => {
           if (!records || records.length === 0) {
-            this.errorMessage = "No records found for this group";
+            this.errorMessage = 'No records found for this group';
             this.visibleError = true;
             return of([]);
           }
@@ -283,8 +282,8 @@ export class ListRecordsComponent {
           this.cdr.markForCheck();
         },
         error: (error) => {
-          console.error("Error loading records:", error);
-          this.errorMessage = "Error loading records";
+          console.error('Error loading records:', error);
+          this.errorMessage = 'Error loading records';
           this.visibleError = true;
         },
       });
@@ -300,8 +299,8 @@ export class ListRecordsComponent {
           this.cdr.markForCheck();
         },
         error: (error) => {
-          console.error("Error loading group name:", error);
-          this.errorMessage = "Error loading group name";
+          console.error('Error loading group name:', error);
+          this.errorMessage = 'Error loading group name';
           this.visibleError = true;
         },
       });
@@ -336,7 +335,7 @@ export class ListRecordsComponent {
       this.visiblePhoto = false;
     } else {
       this.record = record;
-      this.photo = record.imageRecord || "";
+      this.photo = record.imageRecord || '';
       this.visiblePhoto = true;
     }
   }
@@ -347,7 +346,7 @@ export class ListRecordsComponent {
     }
 
     this.isAddingToCart = true;
-    this.errorMessage = "";
+    this.errorMessage = '';
     this.visibleError = false;
 
     // Update stock locally first for immediate response
@@ -375,9 +374,9 @@ export class ListRecordsComponent {
           this.records = revertedRecords;
           this.filteredRecords = revertedRecords;
 
-          this.errorMessage = error.message || "Error adding to cart";
+          this.errorMessage = error.message || 'Error adding to cart';
           this.visibleError = true;
-          console.error("Error adding to cart:", error);
+          console.error('Error adding to cart:', error);
           return throwError(() => error);
         })
       )
@@ -459,9 +458,9 @@ export class ListRecordsComponent {
               : r
           );
 
-          this.errorMessage = error.message || "Error removing from cart";
+          this.errorMessage = error.message || 'Error removing from cart';
           this.visibleError = true;
-          console.error("Error removing from cart:", error);
+          console.error('Error removing from cart:', error);
           return throwError(() => error);
         })
       )

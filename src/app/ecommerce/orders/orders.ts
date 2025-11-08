@@ -1,23 +1,24 @@
-import { Component, inject, afterNextRender, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import {
+  Component,
+  inject,
+  afterNextRender,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { OrderService } from '../services/order';
-import { UserService } from 'src/app/services/users';
+import { UserService } from 'src/app/services/user';
 import { Subject, takeUntil } from 'rxjs';
 import { IOrder } from '../ecommerce.interface';
 import { TableModule } from 'primeng/table';
 
 @Component({
-    selector: 'app-orders',
-    standalone: true,
-    templateUrl: './orders.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [
-        CommonModule,
-        FormsModule,
-        TableModule
-    ]
+  selector: 'app-orders',
+  templateUrl: './orders.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [CommonModule, FormsModule, TableModule],
 })
 export class OrdersComponent {
   orders: IOrder[] = [];
@@ -34,19 +35,18 @@ export class OrdersComponent {
 
   constructor() {
     // Subscribe to user email changes
-    this.userService.emailUser$.pipe(
-      takeUntilDestroyed()
-    ).subscribe((email) => {
-      if (email) {
-        this.loadOrders(email);
-      }
-    });
+    this.userService.emailUser$
+      .pipe(takeUntilDestroyed())
+      .subscribe((email) => {
+        if (email) {
+          this.loadOrders(email);
+        }
+      });
 
     // afterNextRender runs once after the component is initially rendered
     afterNextRender(() => {
       // Any DOM-dependent initialization can go here
     });
-
   }
 
   loadOrders(email: string): void {
@@ -68,7 +68,6 @@ export class OrdersComponent {
       },
     });
   }
-
 
   toggleOrderDetails(orderId: number): void {
     this.expandedOrderId = this.expandedOrderId === orderId ? null : orderId;

@@ -12,7 +12,7 @@ import {
 import { environment } from 'src/environments/environment';
 import { AuthGuard } from '../../guards/auth-guard';
 import { ICartDetail, IRecord } from '../ecommerce.interface';
-import { UserService } from 'src/app/services/users';
+import { UserService } from 'src/app/services/user';
 import { StockService } from './stock';
 import { RecordsService } from './records';
 
@@ -35,7 +35,12 @@ export class CartDetailService {
     }
     const headers = this.getHeaders();
     return this.http
-      .get(`${this.urlAPI}CartDetails/GetCartItemCount/${encodeURIComponent(email)}`, { headers })
+      .get(
+        `${this.urlAPI}CartDetails/GetCartItemCount/${encodeURIComponent(
+          email
+        )}`,
+        { headers }
+      )
       .pipe(
         catchError((error) => {
           console.error('Error getting cart item count:', error);
@@ -54,98 +59,123 @@ export class CartDetailService {
     // Get the current user's email to verify ownership
     const currentUser = this.authGuard.getUser();
     if (email !== currentUser) {
-      console.warn(`[CartDetailService] Access denied: User ${currentUser} cannot access cart for ${email}`);
+      console.warn(
+        `[CartDetailService] Access denied: User ${currentUser} cannot access cart for ${email}`
+      );
       return of({ $values: [] });
     }
 
     // Get the cart ID from the token or session storage
     const cartId = this.authGuard.getCartId();
-    
+
     // If we don't have a cart ID, try to get cart by email
     if (!cartId) {
       return this.getCartDetailsByEmail(email).pipe(
-        map(cartDetails => ({
-          $values: Array.isArray(cartDetails) ? cartDetails : [cartDetails]
+        map((cartDetails) => ({
+          $values: Array.isArray(cartDetails) ? cartDetails : [cartDetails],
         })),
-        catchError(error => {
-          console.error('[CartDetailService] Error getting cart details by email:', error);
+        catchError((error) => {
+          console.error(
+            '[CartDetailService] Error getting cart details by email:',
+            error
+          );
           return of({ $values: [] });
         })
       );
     }
-    
+
     const headers = this.getHeaders();
     const url = `${this.urlAPI}CartDetails/GetCartDetailsByCartId/${cartId}`;
-    
-    return this.http.get<{ $values: any[] } | any[]>(url, { 
-      headers,
-      observe: 'response'
-    }).pipe(
-      map(response => {
-        const body = response.body;
-        // Handle different possible response formats
-        if (Array.isArray(body)) {
-          return { $values: body };
-        } else if (body && Array.isArray((body as any).$values)) {
-          return body as { $values: any[] };
-        } else if (body && typeof body === 'object') {
-          // If the response is an object but doesn't have $values, return it as is
-          return { $values: [body] };
-        } else {
-          return { $values: [] };
-        }
-      }),
-      catchError((error) => {
-        console.error('[CartDetailService] Error getting cart details:', {
-          status: error.status,
-          statusText: error.statusText,
-          error: error.error,
-          url: error.url,
-          headers: error.headers
-        });
-        
-        if (error.status === 403) {
-          console.warn('[CartDetailService] Access denied - User does not have permission to access this cart');
-        }
-        
-        // Fall back to email-based endpoint if cart ID approach fails
-        if (error.status === 404) {
-          return this.http.get<{ $values: any[] }>(
-            `${this.urlAPI}CartDetails/GetCartDetails/${encodeURIComponent(email)}`,
-            { headers }
-          ).pipe(
-            catchError(fallbackError => {
-              console.error('[CartDetailService] Fallback endpoint also failed:', fallbackError);
-              return of({ $values: [] });
-            })
-          );
-        }
-        
-        return of({ $values: [] });
+
+    return this.http
+      .get<{ $values: any[] } | any[]>(url, {
+        headers,
+        observe: 'response',
       })
-    );
+      .pipe(
+        map((response) => {
+          const body = response.body;
+          // Handle different possible response formats
+          if (Array.isArray(body)) {
+            return { $values: body };
+          } else if (body && Array.isArray((body as any).$values)) {
+            return body as { $values: any[] };
+          } else if (body && typeof body === 'object') {
+            // If the response is an object but doesn't have $values, return it as is
+            return { $values: [body] };
+          } else {
+            return { $values: [] };
+          }
+        }),
+        catchError((error) => {
+          console.error('[CartDetailService] Error getting cart details:', {
+            status: error.status,
+            statusText: error.statusText,
+            error: error.error,
+            url: error.url,
+            headers: error.headers,
+          });
+
+          if (error.status === 403) {
+            console.warn(
+              '[CartDetailService] Access denied - User does not have permission to access this cart'
+            );
+          }
+
+          // Fall back to email-based endpoint if cart ID approach fails
+          if (error.status === 404) {
+            return this.http
+              .get<{ $values: any[] }>(
+                `${this.urlAPI}CartDetails/GetCartDetails/${encodeURIComponent(
+                  email
+                )}`,
+                { headers }
+              )
+              .pipe(
+                catchError((fallbackError) => {
+                  console.error(
+                    '[CartDetailService] Fallback endpoint also failed:',
+                    fallbackError
+                  );
+                  return of({ $values: [] });
+                })
+              );
+          }
+
+          return of({ $values: [] });
+        })
+      );
   }
 
   // Debug method to check cart details
   debugGetCartDetails(email: string): void {
-    const url = `${this.urlAPI}CartDetails/GetCartDetails/${encodeURIComponent(email)}`;
-    console.log(`[CartDetailService][DEBUG] Fetching cart details from: ${url}`);
-    
-    this.http.get(url, { headers: this.getHeaders() })
-      .subscribe({
-        next: (response) => {
-          if (response && typeof response === 'object') {
-            console.log('[CartDetailService][DEBUG] Response keys:', Object.keys(response));
-          }
-        },
-        error: (error) => {
-          console.error('[CartDetailService][DEBUG] Error fetching cart details:', {
+    const url = `${this.urlAPI}CartDetails/GetCartDetails/${encodeURIComponent(
+      email
+    )}`;
+    console.log(
+      `[CartDetailService][DEBUG] Fetching cart details from: ${url}`
+    );
+
+    this.http.get(url, { headers: this.getHeaders() }).subscribe({
+      next: (response) => {
+        if (response && typeof response === 'object') {
+          console.log(
+            '[CartDetailService][DEBUG] Response keys:',
+            Object.keys(response)
+          );
+        }
+      },
+      error: (error) => {
+        console.error(
+          '[CartDetailService][DEBUG] Error fetching cart details:',
+          {
             status: error.status,
             error: error.error,
-            url: error.url
-          });
-        }
-      });
+            url: error.url,
+          }
+        );
+      },
+    });
   }
 
   getRecordDetails(recordId: number): Observable<IRecord | null> {
@@ -163,21 +193,23 @@ export class CartDetailService {
     amount: number
   ): Observable<any> {
     const headers = this.getHeaders();
-    
+
     return this.http
       .post(
-        `${this.urlAPI}CartDetails/addToCartDetailAndCart/${encodeURIComponent(email)}?recordId=${recordId}&amount=${amount}`,
+        `${this.urlAPI}CartDetails/addToCartDetailAndCart/${encodeURIComponent(
+          email
+        )}?recordId=${recordId}&amount=${amount}`,
         {},
-        { 
+        {
           headers,
-          observe: 'response' 
+          observe: 'response',
         }
       )
       .pipe(
         switchMap((response: any) => {
           // Get the updated stock from the registry
           return this.getRecordDetails(recordId).pipe(
-            map(record => {
+            map((record) => {
               if (!record) {
                 throw new Error('The updated record could not be obtained.');
               }
@@ -185,7 +217,7 @@ export class CartDetailService {
                 success: true,
                 recordId: recordId,
                 amount: amount,
-                stock: record.stock // Include updated stock
+                stock: record.stock, // Include updated stock
               };
             })
           );
@@ -195,7 +227,7 @@ export class CartDetailService {
             status: error.status,
             statusText: error.statusText,
             error: error.error,
-            url: error.url
+            url: error.url,
           });
           return throwError(() => error);
         })
@@ -214,18 +246,22 @@ export class CartDetailService {
     const headers = this.getHeaders();
     return this.http
       .post(
-        `${this.urlAPI}CartDetails/removeFromCartDetailAndCart/${encodeURIComponent(email)}?recordId=${recordId}&amount=${amount}`,
+        `${
+          this.urlAPI
+        }CartDetails/removeFromCartDetailAndCart/${encodeURIComponent(
+          email
+        )}?recordId=${recordId}&amount=${amount}`,
         {},
-        { 
+        {
           headers,
-          observe: 'response'
+          observe: 'response',
         }
       )
       .pipe(
         switchMap((response: any) => {
           // Get the updated stock from the registry
           return this.getRecordDetails(recordId).pipe(
-            map(record => {
+            map((record) => {
               if (!record) {
                 throw new Error('The updated record could not be obtained.');
               }
@@ -233,7 +269,7 @@ export class CartDetailService {
                 success: true,
                 recordId: recordId,
                 amount: -amount,
-                stock: record.stock // Include updated stock
+                stock: record.stock, // Include updated stock
               };
             })
           );
@@ -243,7 +279,7 @@ export class CartDetailService {
             status: error.status,
             statusText: error.statusText,
             error: error.error,
-            url: error.url
+            url: error.url,
           });
           return throwError(() => error);
         })
@@ -364,96 +400,112 @@ export class CartDetailService {
   }
 
   getCartDetailsByEmail(email: string): Observable<ICartDetail[]> {
-    const url = `${this.urlAPI}CartDetails/GetCartDetails/${encodeURIComponent(email)}`;
+    const url = `${this.urlAPI}CartDetails/GetCartDetails/${encodeURIComponent(
+      email
+    )}`;
     const token = this.authGuard.getToken();
-    
+
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
-      'Accept': 'application/json',
-      'Authorization': `Bearer ${token}`
+      Accept: 'application/json',
+      Authorization: `Bearer ${token}`,
     });
-    
-    return this.http.get<any>(url, { 
-      headers,
-      observe: 'response' // To see the full response headers
-    }).pipe(
-      tap(response => {
-      }),
-      map(response => {
-        // Handle different response formats
-        let data = response.body;
-        
-        if (Array.isArray(data)) {
-          return data as ICartDetail[];
-        } else if (data && Array.isArray(data.$values)) {
-          return data.$values as ICartDetail[];
-        } else if (data && typeof data === 'object') {
-          return [data] as ICartDetail[];
-        }
-        
-        return [];
-      }),
-      catchError((error: any) => {
-        console.error('[CartDetailService] Error in the request:', {
-          status: error.status,
-          statusText: error.statusText,
-          url: error.url || url,
-          error: error.error,
-          headers: error.headers ? Object.fromEntries(
-            Object.entries(error.headers)
-              .filter(([key]) => !key.toLowerCase().includes('authorization'))
-          ) : 'No headers'
-        });
-        
-        // If it is a 403 error, try the debug method
-        if (error.status === 403) {
-          console.warn('[CartDetailService] Access attempt denied (403). Testing with debugging method...');
-          return this.debugFetchCartDetails(email);
-        }
-        
-        return throwError(() => error);
+
+    return this.http
+      .get<any>(url, {
+        headers,
+        observe: 'response', // To see the full response headers
       })
-    );
+      .pipe(
+        tap((response) => {}),
+        map((response) => {
+          // Handle different response formats
+          let data = response.body;
+
+          if (Array.isArray(data)) {
+            return data as ICartDetail[];
+          } else if (data && Array.isArray(data.$values)) {
+            return data.$values as ICartDetail[];
+          } else if (data && typeof data === 'object') {
+            return [data] as ICartDetail[];
+          }
+
+          return [];
+        }),
+        catchError((error: any) => {
+          console.error('[CartDetailService] Error in the request:', {
+            status: error.status,
+            statusText: error.statusText,
+            url: error.url || url,
+            error: error.error,
+            headers: error.headers
+              ? Object.fromEntries(
+                  Object.entries(error.headers).filter(
+                    ([key]) => !key.toLowerCase().includes('authorization')
+                  )
+                )
+              : 'No headers',
+          });
+
+          // If it is a 403 error, try the debug method
+          if (error.status === 403) {
+            console.warn(
+              '[CartDetailService] Access attempt denied (403). Testing with debugging method...'
+            );
+            return this.debugFetchCartDetails(email);
+          }
+
+          return throwError(() => error);
+        })
+      );
   }
-  
+
   // Alternative method using fetch for diagnosis
   private async debugFetchCartDetails(email: string): Promise<ICartDetail[]> {
-    const url = `${this.urlAPI}CartDetails/GetCartDetails/${encodeURIComponent(email)}`;
+    const url = `${this.urlAPI}CartDetails/GetCartDetails/${encodeURIComponent(
+      email
+    )}`;
     const token = this.authGuard.getToken();
-    
-    console.log('[CartDetailService][DEBUG] Testing with direct fetch to:', url);
-    
+
+    console.log(
+      '[CartDetailService][DEBUG] Testing with direct fetch to:',
+      url
+    );
+
     try {
       const response = await fetch(url, {
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        }
+          Accept: 'application/json',
+        },
       });
-      
+
       // Create a simple object with headers
       const responseHeaders: { [key: string]: string } = {};
       response.headers.forEach((value, key) => {
         responseHeaders[key] = value;
       });
-      
+
       console.log('[CartDetailService][DEBUG] Fetch response:', {
         status: response.status,
         statusText: response.statusText,
         ok: response.ok,
-        headers: responseHeaders
+        headers: responseHeaders,
       });
-      
+
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('[CartDetailService][DEBUG] Error in the response:', errorText);
+        console.error(
+          '[CartDetailService][DEBUG] Error in the response:',
+          errorText
+        );
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       const data = await response.json();
       console.log('[CartDetailService][DEBUG] Response data:', data);
-      
+
       if (Array.isArray(data)) {
         return data as ICartDetail[];
       } else if (data && Array.isArray(data.$values)) {
@@ -461,7 +513,7 @@ export class CartDetailService {
       } else if (data && typeof data === 'object') {
         return [data] as ICartDetail[];
       }
-      
+
       return [];
     } catch (error) {
       console.error('[CartDetailService][DEBUG] Error in direct fetch:', error);

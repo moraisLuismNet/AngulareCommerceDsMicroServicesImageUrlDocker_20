@@ -5,44 +5,44 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   DestroyRef,
-} from "@angular/core";
-import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
-import { CommonModule } from "@angular/common";
-import { FormsModule } from "@angular/forms";
-import { ConfirmationService } from "primeng/api";
-import { ActivatedRoute, RouterModule } from "@angular/router";
-import { of } from "rxjs";
-import { filter, map, catchError } from "rxjs/operators";
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { ConfirmationService } from 'primeng/api';
+import { ActivatedRoute, RouterModule } from '@angular/router';
+import { of } from 'rxjs';
+import { filter, map, catchError } from 'rxjs/operators';
 
 // PrimeNG Modules
-import { TableModule } from "primeng/table";
-import { ButtonModule } from "primeng/button";
-import { TagModule } from "primeng/tag";
-import { TooltipModule } from "primeng/tooltip";
-import { InputNumberModule } from "primeng/inputnumber";
-import { ConfirmDialogModule } from "primeng/confirmdialog";
-import { DialogModule } from "primeng/dialog";
+import { TableModule } from 'primeng/table';
+import { ButtonModule } from 'primeng/button';
+import { TagModule } from 'primeng/tag';
+import { TooltipModule } from 'primeng/tooltip';
+import { InputNumberModule } from 'primeng/inputnumber';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { DialogModule } from 'primeng/dialog';
 
 // Services
-import { UserService } from "src/app/services/users";
-import { CartDetailService } from "../services/cart-detail";
-import { CartService } from "../services/cart";
-import { OrderService } from "../services/order";
+import { UserService } from 'src/app/services/user';
+import { CartDetailService } from '../services/cart-detail';
+import { CartService } from '../services/cart';
+import { OrderService } from '../services/order';
 
 // Guards
-import { AuthGuard } from "src/app/guards/auth-guard";
+import { AuthGuard } from 'src/app/guards/auth-guard';
 
 // Interfaces
 import {
   ICartDetail,
   IRecord,
   ExtendedCartDetail,
-} from "../ecommerce.interface";
+} from '../ecommerce.interface';
 
 @Component({
-  selector: "app-cart-details",
-  templateUrl: "./cart-details.html",
-  styleUrls: ["./cart-details.css"],
+  selector: 'app-cart-details',
+  templateUrl: './cart-details.html',
+  styleUrls: ['./cart-details.css'],
   imports: [
     CommonModule,
     FormsModule,
@@ -61,13 +61,13 @@ import {
 export class CartDetailsComponent {
   cartDetails: ICartDetail[] = [];
   filteredCartDetails: ExtendedCartDetail[] = [];
-  emailUser: string | null = "";
+  emailUser: string | null = '';
   isAddingToCart = false;
-  currentViewedEmail: string = "";
+  currentViewedEmail: string = '';
   isViewingAsAdmin: boolean = false;
   isCreatingOrder = false;
-  alertMessage: string = "";
-  alertType: "success" | "error" | null = null;
+  alertMessage: string = '';
+  alertType: 'success' | 'error' | null = null;
 
   private readonly cartDetailService = inject(CartDetailService);
   private readonly route = inject(ActivatedRoute);
@@ -80,7 +80,7 @@ export class CartDetailsComponent {
   constructor() {
     // Initial data loading
     this.route.queryParams.pipe(takeUntilDestroyed()).subscribe((params) => {
-      const viewingUserEmail = params["viewingUserEmail"];
+      const viewingUserEmail = params['viewingUserEmail'];
 
       if (viewingUserEmail && this.userService.isAdmin()) {
         // Admin
@@ -111,7 +111,7 @@ export class CartDetailsComponent {
 
   // Method to extract the group name from several possible locations
   private extractGroupName(detail: any): string {
-    if (!detail) return "Sin grupo";
+    if (!detail) return 'Sin grupo';
 
     // List of possible group name locations
     const possibleGroupPaths = [
@@ -130,10 +130,10 @@ export class CartDetailsComponent {
     // Find the first valid value
     const groupName = possibleGroupPaths.find(
       (name) =>
-        name !== undefined && name !== null && name !== "" && name !== "N/A"
+        name !== undefined && name !== null && name !== '' && name !== 'N/A'
     );
 
-    return groupName || "Sin grupo";
+    return groupName || 'Sin grupo';
   }
 
   private loadCartDetails(email: string): void {
@@ -175,21 +175,21 @@ export class CartDetailsComponent {
               recordTitle:
                 detail.recordTitle ||
                 detail.record?.titleRecord ||
-                "Sin título",
+                'Sin título',
               groupName: groupName,
               price: detail.price || 0,
               total: (detail.price || 0) * (detail.amount || 0),
               imageRecord:
                 detail.imageRecord ||
                 detail.record?.imageRecord ||
-                "assets/img/placeholder.png",
+                'assets/img/placeholder.png',
               record: detail.record,
             };
           });
           return response?.$values || response?.Items || [];
         }),
         catchError((error) => {
-          console.error("Error loading cart details:", error);
+          console.error('Error loading cart details:', error);
           return of([]); // Always return empty array on errors
         })
       )
@@ -229,10 +229,10 @@ export class CartDetailsComponent {
             const updatedDetail = {
               ...this.filteredCartDetails[index],
               stock: record.stock,
-              groupName: record.groupName || record.nameGroup || "N/A",
-              recordTitle: record.titleRecord || "No Title",
+              groupName: record.groupName || record.nameGroup || 'N/A',
+              recordTitle: record.titleRecord || 'No Title',
               price: record.price || 0,
-              imageRecord: record.imageRecord || "assets/img/placeholder.png",
+              imageRecord: record.imageRecord || 'assets/img/placeholder.png',
             } as ExtendedCartDetail;
 
             // Update the array immutably
@@ -263,7 +263,7 @@ export class CartDetailsComponent {
 
     return this.cartDetails.filter(
       (detail) =>
-        detail && typeof detail.amount === "number" && detail.amount > 0
+        detail && typeof detail.amount === 'number' && detail.amount > 0
     ) as ExtendedCartDetail[];
   }
 
@@ -315,10 +315,10 @@ export class CartDetailsComponent {
         }
       }
 
-      this.showAlert("Product added to cart", "success");
+      this.showAlert('Product added to cart', 'success');
     } catch (error) {
-      console.error("Error adding to cart:", error);
-      this.showAlert("Failed to add product to cart", "error");
+      console.error('Error adding to cart:', error);
+      this.showAlert('Failed to add product to cart', 'error');
       // Revert local changes if it fails
       const itemIndex = this.filteredCartDetails.findIndex(
         (d) => d.recordId === detail.recordId
@@ -338,15 +338,15 @@ export class CartDetailsComponent {
     try {
       const record: IRecord = {
         idRecord: detail.recordId,
-        titleRecord: detail.recordTitle || "",
+        titleRecord: detail.recordTitle || '',
         price: detail.price || 0,
         stock: detail.stock || 0,
-        imageRecord: (detail as any).imageRecord || "",
+        imageRecord: (detail as any).imageRecord || '',
         yearOfPublication: null,
         discontinued: false,
         groupId: null,
-        groupName: detail.groupName || "",
-        nameGroup: detail.groupName || "",
+        groupName: detail.groupName || '',
+        nameGroup: detail.groupName || '',
         amount: detail.amount || 0,
         inCart: true,
       };
@@ -385,10 +385,10 @@ export class CartDetailsComponent {
         }
       }
 
-      this.showAlert("Product removed from cart", "success");
+      this.showAlert('Product removed from cart', 'success');
     } catch (error) {
-      console.error("Error removing from cart:", error);
-      this.showAlert("Failed to remove product from cart", "error");
+      console.error('Error removing from cart:', error);
+      this.showAlert('Failed to remove product from cart', 'error');
       // On error, reload the cart from server to ensure UI is in sync with backend
       await this.loadCartDetails(this.currentViewedEmail);
     }
@@ -414,24 +414,24 @@ export class CartDetailsComponent {
     this.clearAlert();
 
     try {
-      const paymentMethod = "credit-card";
+      const paymentMethod = 'credit-card';
       const order = await this.orderService
         .createOrderFromCart(this.currentViewedEmail, paymentMethod)
         .toPromise();
 
-      this.showAlert("Order created successfully", "success");
+      this.showAlert('Order created successfully', 'success');
       this.cartService.resetCart();
       this.loadCartDetails(this.currentViewedEmail);
     } catch (error: any) {
-      console.error("Full error:", error);
-      const errorMsg = error.error?.message || "Failed to create order";
-      this.showAlert(errorMsg, "error");
+      console.error('Full error:', error);
+      const errorMsg = error.error?.message || 'Failed to create order';
+      this.showAlert(errorMsg, 'error');
     } finally {
       this.isCreatingOrder = false;
     }
   }
 
-  private showAlert(message: string, type: "success" | "error"): void {
+  private showAlert(message: string, type: 'success' | 'error'): void {
     this.alertMessage = message;
     this.alertType = type;
     this.cdr.markForCheck();
@@ -444,7 +444,7 @@ export class CartDetailsComponent {
   }
 
   private clearAlert(): void {
-    this.alertMessage = "";
+    this.alertMessage = '';
     this.alertType = null;
     this.cdr.markForCheck();
   }

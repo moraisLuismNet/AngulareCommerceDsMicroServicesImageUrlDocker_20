@@ -99,10 +99,10 @@ export class UserService implements OnDestroy {
     if (currentEmail) {
       this.userLoggedOutSubject.next(currentEmail);
       this.cleanUserLocalData(currentEmail);
-      
+
       // Emit cart reset event before clearing user data
       this.cartEvents.resetCart();
-      
+
       sessionStorage.removeItem(this.STORAGE_KEY);
       this.clearEmail();
       this.clearRole();

@@ -6,67 +6,67 @@ import {
   afterNextRender,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
-  DestroyRef
-} from "@angular/core";
-import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
-import { CommonModule } from "@angular/common";
-import { FormsModule, NgForm } from "@angular/forms";
-import { ConfirmationService } from "primeng/api";
-import { TableModule } from "primeng/table";
-import { ButtonModule } from "primeng/button";
-import { ConfirmDialogModule } from "primeng/confirmdialog";
-import { DialogModule } from "primeng/dialog";
-import { InputTextModule } from "primeng/inputtext";
-import { InputNumberModule } from "primeng/inputnumber";
-import { CheckboxModule } from "primeng/checkbox";
-import { IRecord } from "../ecommerce.interface";
-import { RecordsService } from "../services/records";
-import { GroupsService } from "../services/groups";
-import { StockService } from "../services/stock";
-import { CartService } from "../services/cart";
-import { UserService } from "src/app/services/users";
+  DestroyRef,
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { CommonModule } from '@angular/common';
+import { FormsModule, NgForm } from '@angular/forms';
+import { ConfirmationService } from 'primeng/api';
+import { TableModule } from 'primeng/table';
+import { ButtonModule } from 'primeng/button';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { DialogModule } from 'primeng/dialog';
+import { InputTextModule } from 'primeng/inputtext';
+import { InputNumberModule } from 'primeng/inputnumber';
+import { CheckboxModule } from 'primeng/checkbox';
+import { IRecord } from '../ecommerce.interface';
+import { RecordsService } from '../services/records';
+import { GroupsService } from '../services/groups';
+import { StockService } from '../services/stock';
+import { CartService } from '../services/cart';
+import { UserService } from 'src/app/services/user';
 
 @Component({
-    selector: "app-records",
-    templateUrl: "./records.html",
-    changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [
-        CommonModule,
-        FormsModule,
-        TableModule,
-        ButtonModule,
-        ConfirmDialogModule,
-        DialogModule,
-        InputTextModule,
-        InputNumberModule,
-        CheckboxModule
-    ],
-    providers: [ConfirmationService]
+  selector: 'app-records',
+  templateUrl: './records.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [
+    CommonModule,
+    FormsModule,
+    TableModule,
+    ButtonModule,
+    ConfirmDialogModule,
+    DialogModule,
+    InputTextModule,
+    InputNumberModule,
+    CheckboxModule,
+  ],
+  providers: [ConfirmationService],
 })
 export class RecordsComponent {
-  @ViewChild("form") form!: NgForm;
+  @ViewChild('form') form!: NgForm;
   // File input removed - using URL input instead
   visibleError = false;
-  errorMessage = "";
+  errorMessage = '';
   records: IRecord[] = [];
   filteredRecords: IRecord[] = [];
   visibleConfirm = false;
-  imageRecord = "";
+  imageRecord = '';
   visiblePhoto = false;
-  photo = "";
-  searchText: string = "";
+  photo = '';
+  searchText: string = '';
 
   record: IRecord = {
     idRecord: 0,
-    titleRecord: "",
+    titleRecord: '',
     yearOfPublication: null,
     imageRecord: null,
     price: 0,
     stock: 0,
     discontinued: false,
     groupId: null,
-    groupName: "",
-    nameGroup: "",
+    groupName: '',
+    nameGroup: '',
   };
 
   groups: any[] = [];
@@ -88,15 +88,15 @@ export class RecordsComponent {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((update) => {
         if (!update) return;
-        
+
         const { recordId, newStock } = update;
-        
+
         // Create new array references to trigger change detection
-        this.records = this.records.map(record => 
+        this.records = this.records.map((record) =>
           record.idRecord === recordId ? { ...record, stock: newStock } : record
         );
-        
-        this.filteredRecords = this.filteredRecords.map(record => 
+
+        this.filteredRecords = this.filteredRecords.map((record) =>
           record.idRecord === recordId ? { ...record, stock: newStock } : record
         );
         this.cdr.markForCheck();
@@ -141,9 +141,9 @@ export class RecordsComponent {
         } else if (data && Array.isArray(data.data)) {
           recordsArray = data.data;
         }
-        
+
         // Initialize stock values in the stock service
-        recordsArray.forEach(record => {
+        recordsArray.forEach((record) => {
           if (record.idRecord && typeof record.stock === 'number') {
             this.stockService.updateStock(record.idRecord, record.stock);
           }
@@ -155,7 +155,10 @@ export class RecordsComponent {
             let groups: any[] = [];
             if (Array.isArray(groupsResponse)) {
               groups = groupsResponse;
-            } else if (groupsResponse && Array.isArray(groupsResponse.$values)) {
+            } else if (
+              groupsResponse &&
+              Array.isArray(groupsResponse.$values)
+            ) {
               groups = groupsResponse.$values;
             }
 
@@ -172,18 +175,20 @@ export class RecordsComponent {
                 discontinued: record.discontinued || false,
                 groupId: record.groupId || null,
                 groupName: '',
-                nameGroup: ''
+                nameGroup: '',
               };
-              
+
               // Find matching group and assign name
               if (processedRecord.groupId !== null) {
-                const group = groups.find(g => g.idGroup === processedRecord.groupId);
+                const group = groups.find(
+                  (g) => g.idGroup === processedRecord.groupId
+                );
                 if (group) {
                   processedRecord.groupName = group.nameGroup || '';
                   processedRecord.nameGroup = group.nameGroup || '';
                 }
               }
-              
+
               return processedRecord;
             });
 
@@ -192,7 +197,7 @@ export class RecordsComponent {
             this.cdr.markForCheck();
           },
           error: (err) => {
-            console.error("Error getting groups:", err);
+            console.error('Error getting groups:', err);
             this.records = recordsArray;
             this.filteredRecords = [...this.records];
             this.cdr.markForCheck();
@@ -200,7 +205,7 @@ export class RecordsComponent {
         });
       },
       error: (err) => {
-        console.error("Error getting records:", err);
+        console.error('Error getting records:', err);
         this.visibleError = true;
         this.controlError(err);
       },
@@ -245,14 +250,14 @@ export class RecordsComponent {
           // The response has data property
           groupsArray = response.data;
         } else {
-          console.warn("Unexpected API response structure:", response);
+          console.warn('Unexpected API response structure:', response);
         }
 
         this.groups = groupsArray;
         this.cdr.markForCheck();
       },
       error: (err) => {
-        console.error("Error loading groups:", err);
+        console.error('Error loading groups:', err);
         this.visibleError = true;
         this.controlError(err);
       },
@@ -273,11 +278,10 @@ export class RecordsComponent {
   }
 
   save() {
-    
     // Create a clean copy of the record with proper null handling for imageRecord
     const recordToSave = {
       ...this.record,
-      imageRecord: this.record.imageRecord || null
+      imageRecord: this.record.imageRecord || null,
     };
 
     if (this.record.idRecord === 0) {
@@ -315,10 +319,10 @@ export class RecordsComponent {
   confirmDelete(record: IRecord) {
     this.confirmationService.confirm({
       message: `Delete record ${record.titleRecord}?`,
-      header: "Are you sure?",
-      icon: "pi pi-exclamation-triangle",
-      acceptLabel: "Yes",
-      acceptButtonStyleClass: "p-button-danger",
+      header: 'Are you sure?',
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Yes',
+      acceptButtonStyleClass: 'p-button-danger',
       accept: () => this.deleteRecord(record.idRecord),
     });
   }
@@ -333,7 +337,7 @@ export class RecordsComponent {
       error: (err: any) => {
         this.visibleError = true;
         this.controlError(err);
-      }
+      },
     });
   }
 
@@ -346,33 +350,33 @@ export class RecordsComponent {
   resetForm() {
     this.record = {
       idRecord: 0,
-      titleRecord: "",
+      titleRecord: '',
       yearOfPublication: null,
       imageRecord: null,
       price: 0,
       stock: 0,
       discontinued: false,
-      groupId: null,  // Use null to match IRecord interface
-      groupName: "",
-      nameGroup: ""
+      groupId: null, // Use null to match IRecord interface
+      groupName: '',
+      nameGroup: '',
     };
-    
+
     // Reset the form validation state
     if (this.form) {
       this.form.resetForm({
         idRecord: 0,
-        titleRecord: "",
+        titleRecord: '',
         yearOfPublication: null,
         imageRecord: null,
         price: 0,
         stock: 0,
         discontinued: false,
         groupId: null,
-        groupName: "",
-        nameGroup: ""
+        groupName: '',
+        nameGroup: '',
       });
     }
-    
+
     this.cdr.markForCheck();
   }
 
@@ -392,23 +396,23 @@ export class RecordsComponent {
     if (!item1 || !item2) {
       return item1 === item2;
     }
-    
+
     // Compare by ID if both items have idGroup
     if (item1.idGroup && item2.idGroup) {
       return item1.idGroup === item2.idGroup;
     }
-    
+
     // Direct comparison for primitive values
     return item1 === item2;
   }
 
   controlError(err: any) {
-    if (err.error && typeof err.error === "object" && err.error.message) {
+    if (err.error && typeof err.error === 'object' && err.error.message) {
       this.errorMessage = err.error.message;
-    } else if (typeof err.error === "string") {
+    } else if (typeof err.error === 'string') {
       this.errorMessage = err.error;
     } else {
-      this.errorMessage = "An unexpected error has occurred";
+      this.errorMessage = 'An unexpected error has occurred';
     }
   }
 
@@ -424,7 +428,7 @@ export class RecordsComponent {
         this.filteredRecords = [...this.records];
       },
       (error) => {
-        console.error("Error adding to cart:", error);
+        console.error('Error adding to cart:', error);
         // Revert local changes if it fails
         record.inCart = false;
         record.amount = 0;
@@ -445,7 +449,7 @@ export class RecordsComponent {
         this.filteredRecords = [...this.records];
       },
       (error) => {
-        console.error("Error removing from cart:", error);
+        console.error('Error removing from cart:', error);
         // Revert local changes if it fails
         record.amount = (record.amount || 0) + 1;
         record.inCart = true;
